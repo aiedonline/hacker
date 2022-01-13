@@ -1,0 +1,9 @@
+{ 	"uuid" : "642136dd-2121-41ea-8e27-6101829ad1121-18", 
+	"keyhash" : "11111111-1111-1111-1111-111111111111", 
+	"jscloud" : "http://127.0.0.1/jscloud/",
+	"cipher" :  "11111111-1111-1111-1111-111111111111",
+    "edb" : "http://127.0.0.1/edb/", "edbkey" : "11111111-1111-1111-1111-111111111111",
+	"auth" : {"file" : "useredb"}, "ip" : [],
+	"domain" : "/local/hacker", 
+	"ui" : { "sigla" : "secanalysis", "title" : "secanalysis", "name" : "SECAnalysis<sup>☠</sup>", "fa" : "fa-discourse" }
+}

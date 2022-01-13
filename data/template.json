@@ -1,0 +1,6 @@
+{
+	"permission" : {"signup" : false, "signon" : true},
+	"page" : {
+		"pages/login" : {"signup_url" : "", "help" : "Entre em contato com wellington.aied@gmail.com"}
+		}
+}

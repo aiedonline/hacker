@@ -1,0 +1,9 @@
+[
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=project&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Projetos"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=cve&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "CVE"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=note_type&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Tipo de notas"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=action_status&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Status Acṍes"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=person&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Pessoas"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=token_user&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Token Acesso"}
+
+]
