@@ -1,0 +1,60 @@
+#!/bin/python3
+#sudo /bin/python3 /var/well/hacker/bot/app.py -s '127.0.0.1' -p '9e424a98-7ef4-d865-40f6-ebb439931f44' -t 'e8fd6417-cfa8-4b0d-a662-0de4a2d3c204' -u 'c308f6804bdd1a856355d3a34113f22a5d5f799b'
+
+import argparse, subprocess, json, time, traceback, sys, os, inspect
+
+ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/";
+os.environ["ROOT"] = ROOT;
+sys.path.insert(0,ROOT);
+
+from api.cachecommand import *;
+from threading import Thread
+from api.hacker import *;
+
+def run_commands(script, dados_de_input):
+    ex = CacheExec();
+    ex.run(["python3", os.environ["ROOT"] + script], dados_de_input);
+    print(ex.stdout, '\033[91m', ex.stderr);
+
+ap = argparse.ArgumentParser();
+ap.add_argument("-s", "--server",  required=True, help="IP do server");
+ap.add_argument("-p", "--project", required=True, help="_id do projeto");
+ap.add_argument("-t", "--token",   required=True, help="Chave gerada para o projeto");
+ap.add_argument("-u", "--user",    required=True, help="Código do usuário");
+args = vars(ap.parse_args())
+
+dados_json = {"project_id" : args["project"], "token" : args["token"],  "user" : args["user"]};
+projeto = SendService(args["server"], "project.php", dados_json );
+
+#{'project': {'_id': '', '_user': '', 'nome': '', 'descricao': '', 'token': ''}, 
+#      'nmap': {'arguments': {'_id': ''}, 'lans': []}}
+
+#{'project': {'_id': '', '_user': '', 'nome': '',  'descricao': '', 'token': ''}, 
+# 'nmap': {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}}
+
+def nmap_switch(server_ip, user, token, nmap_json):
+    # nmap_json = {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}
+    # lans [{"_id":"","name":"","_user":"","ambiente_id":"","address":"","mask":""}]
+    if nmap_json["arguments"].get("enable") == None or nmap_json["arguments"].get("enable") == "0"  :
+        return;
+    for lan in nmap_json['lans']:
+        envelop_nmap = {"server_ip" : server_ip, "address" : lan['address'], "mask" : lan['mask'], "arguments" : nmap_json['arguments']['arguments'], "lan_id" : lan["_id" ], "project_id" : nmap_json['arguments']["project_id" ], "user" : user, "token" : token };
+        Thread(target = run_commands, args = ("network/nmap_scanner.py", envelop_nmap,  )).start();
+
+def shodan_switch(server_ip, user, token, shodan_json):
+    if shodan_json.get("enable") == "0"  :
+        return;
+    #{server_ip, "ip_id" : "", "project_id" : "", "token" : "", "user" : "",  "shodan_key" : "", "host" : ""};
+    for i in range(len( shodan_json['hosts'])):
+        host = shodan_json['hosts'][i];
+        if host== None or host.get("ip") == None:
+            continue;
+        envelop = {"server_ip" : server_ip, "shodan_key" : shodan_json['shodan_key'], "_id" : host["_id"],  "host" : host["ip"], "project_id" : args["project"], "user" : user, "token" : token };
+        run_commands("shodan/app.py", envelop);
+
+#print(json.dumps(projeto));
+if projeto.get('nmap') != None:
+    Thread(target=nmap_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap'  ], ) ).start();
+if projeto.get('shodan') != None:
+    Thread(target=shodan_switch, args=(args["server"], args["user"], args["token"], projeto['shodan'], ) ).start();
+

@@ -1,0 +1,32 @@
+{
+    "admin_c": null,
+    "billing_c": null,
+    "country": "BR",
+    "creation_date": [
+        "1995-07-06 00:00:00",
+        "2008-10-14 00:00:00"
+    ],
+    "domain_name": "sp.gov.br",
+    "email": "csirt@sp.gov.br",
+    "expiration_date": null,
+    "name_server": [
+        "dns1e.sp.gov.br 200.144.6.154",
+        "dns3e.sp.gov.br 200.144.6.92",
+        "dns4e.sp.gov.br 201.55.47.94",
+        "dns2e.sp.gov.br 201.55.16.39"
+    ],
+    "nic_hdl_br": "GEIPR",
+    "nslastaa": "20211106",
+    "nsstat": "20211106 AA",
+    "owner_c": "GEIPR",
+    "person": "Gerencia Internet PRODESP",
+    "registrant_id": "62.577.929/0001-35",
+    "registrant_name": "Cia Proc. de Dados do Estado de S Paulo - Prodesp",
+    "saci": null,
+    "status": "published",
+    "tech_c": "GEIPR",
+    "updated_date": [
+        "2020-11-06 00:00:00",
+        "2020-04-29 00:00:00"
+    ]
+}

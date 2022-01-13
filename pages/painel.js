@@ -1,0 +1,1 @@
+window.location.href = '/secanalysis/pages/virtual.php?entity=project&layout=listar';
