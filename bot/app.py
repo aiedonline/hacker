@@ -35,16 +35,20 @@ projeto = SendService(args["server"], "project.php", dados_json );
 def nmap_switch(server_ip, user, token, nmap_json):
     # nmap_json = {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}
     # lans [{"_id":"","name":"","_user":"","ambiente_id":"","address":"","mask":""}]
-    if nmap_json["arguments"].get("enable") == None or nmap_json["arguments"].get("enable") == "0"  :
-        return;
     for lan in nmap_json['lans']:
         envelop_nmap = {"server_ip" : server_ip, "address" : lan['address'], "mask" : lan['mask'], "arguments" : nmap_json['arguments']['arguments'], "lan_id" : lan["_id" ], "project_id" : nmap_json['arguments']["project_id" ], "user" : user, "token" : token };
         Thread(target = run_commands, args = ("network/nmap_scanner.py", envelop_nmap,  )).start();
 
+def nmap_domain_switch(server_ip, user, token, nmap_json):
+    for ip in nmap_json['ips']:
+        ip["server_ip"] = server_ip;
+        ip["user"] = user;
+        ip["token"] = token;
+        ip["project_id"] = args["project"];
+        Thread(target = run_commands, args = ("domain/nmap_ip.py", ip,  )).start();
+
+
 def shodan_switch(server_ip, user, token, shodan_json):
-    if shodan_json.get("enable") == "0"  :
-        return;
-    #{server_ip, "ip_id" : "", "project_id" : "", "token" : "", "user" : "",  "shodan_key" : "", "host" : ""};
     for i in range(len( shodan_json['hosts'])):
         host = shodan_json['hosts'][i];
         if host== None or host.get("ip") == None:
@@ -52,9 +56,38 @@ def shodan_switch(server_ip, user, token, shodan_json):
         envelop = {"server_ip" : server_ip, "shodan_key" : shodan_json['shodan_key'], "_id" : host["_id"],  "host" : host["ip"], "project_id" : args["project"], "user" : user, "token" : token };
         run_commands("shodan/app.py", envelop);
 
-#print(json.dumps(projeto));
-if projeto.get('nmap') != None:
+def whois_switch(server_ip, user, token, whois_json):
+    for domain in  whois_json['domains']:
+        domain["server_ip"] = server_ip;
+        domain["user"] = user;
+        run_commands("domain/whois_ips.py", domain);
+
+def dns_switch(server_ip, user, token, whois_json):
+    for domain in  whois_json['domains']:
+        domain["server_ip"] = server_ip;
+        domain["user"] = user;
+        run_commands("domain/dns_ips.py", domain);
+
+# TEMOS QUE COLOCAR ANTES DE RODAR IS SCRIPTS UMA DESCRIÇÀO DO QUE VAI SER RODADO
+#     POIS UM SCRIPT PODE DEMORAR E ACABAR DEIXANDO O USUÁRIO NA DÚVIDA.
+print('\033[91m', "\t----==== BOT SECANALYSIS ====----", '\033[0m');
+if projeto.get('nmap') != None and projeto['nmap'].get("enable") != None and projeto['nmap']["enable"] == "1":
+    print("\033[92m -> Run:\033[0m Nmap in LAN");
+if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable") != None and projeto['nmap_domain']["arguments"]["enable"] == "1":
+    print("\033[92m -> Run:\033[0m Nmap in Domains");
+if projeto.get('shodan') != None and projeto['shodan'].get("enable") != None and projeto['shodan']["enable"] == "1":
+    print("\033[92m -> Run:\033[0m Shodan in domains");
+#print(projeto);
+
+print('\033[91m', "\t----==== START ====----", '\033[0m');
+whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
+dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
+
+if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable") != None and projeto['nmap_domain']["arguments"]["enable"] == "1":
+    Thread(target=nmap_domain_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap_domain'  ], ) ).start();
+if projeto.get('nmap') != None and projeto['nmap'].get("enable") != None and projeto['nmap']["enable"] == "1":
     Thread(target=nmap_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap'  ], ) ).start();
-if projeto.get('shodan') != None:
+if projeto.get('shodan') != None and projeto['shodan'].get("enable") != None and projeto['shodan']["enable"] == "1":
     Thread(target=shodan_switch, args=(args["server"], args["user"], args["token"], projeto['shodan'], ) ).start();
 
+print('\033[91m', "\t----==== END ====----", '\033[0m');

@@ -31,7 +31,7 @@ function btn_shodan_salvar_click(){
 
 }
 
-// ----------=========== NMAP ================-----------------
+// ----------=========== NMAP AMBIENTE ================-----------------
 function nmap_options_load(div){
     var DEFAULT_NMAP_ARGUMENTS = "-sV -O"
     EdbRead("project_nmap_arguments", ["project_id"], [Parameter("id")], function(saida, erro, status){
@@ -67,14 +67,46 @@ function btn_nmap_salvar_click(){
     });
 }
 
+
+// ----------=========== NMAP DOMÍNIO ================-----------------
+function nmap_dominio_options_load(div){
+    var DEFAULT_NMAP_ARGUMENTS = "-sV";
+    EdbRead("project_nmap_domain_arguments", ["project_id"], [Parameter("id")], function(saida, erro, status){
+        AddRadioGroup(div, "rd_nmap_domain_enable", [{"value" : 0, "field" : "Não executar" }, {"value" : 1 , "field" : "Executar"}], "field", "value" , false);
+        AddText(div, "text", "Argumentos", "Os argumentos NMAP, acesse livro Hacker entre a luz e as trevas", "txt_nmap_domain_arguments");
+        AddRow(div, [8, 4], undefined, "div_nmap_domain_button");
+        AddButton("div_nmap_domain_button_1", "Salvar parametros Nmap", "btn_nmap_dominio_salvar_click", "btn_nmap_domain_salvar", {"type" : "warning"})
+        
+        if(saida == undefined){
+            EdbWrite(["project_nmap_domain_arguments"], [["_id", "project_id", "enable", "arguments"]], [[Parameter("id"), Parameter("id"), 0, DEFAULT_NMAP_ARGUMENTS]], function(saida, status, erro){
+                rd_nmap_domain_enable.val(0);
+                txt_nmap_domain_arguments.val(DEFAULT_NMAP_ARGUMENTS);
+            });
+            
+        } else{
+            rd_nmap_domain_enable.val(saida['enable']);
+            txt_nmap_domain_arguments.val(saida['arguments']);
+        }
+    });
+}
+
+function btn_nmap_dominio_salvar_click(){
+    EdbWrite(["project_nmap_domain_arguments"], [["_id", "project_id", "enable", "arguments"]], 
+    [[Parameter("id"), Parameter("id"),rd_nmap_domain_enable.val()[0] , txt_nmap_domain_arguments.val() ]], function(saida, status, erro){
+        alert("Sucesso");
+    });
+}
+
+// --------------------------------------------------------------
 function main_process_run(){
     var div = $("#Process");
-    AddTab(div, [{"text" : "Nmap", "div" : "div_process_nmap"}, {"text" : "Shodan", "div" : "div_process_shodan"},
+    AddTab(div, [{"text" : "Nmap (Ambiente Local)", "div" : "div_process_nmap"}, {"text" : "Nmap (Domínios)", "div" : "div_process_nmap_domain"},
+                    {"text" : "Shodan", "div" : "div_process_shodan"},
                     {"text" : "Command line", "div" : "div_process_commandline"}],
      "tab_process_run")
 
     nmap_options_load("div_process_nmap");
+    nmap_dominio_options_load("div_process_nmap_domain");
     shodan_options_load("div_process_shodan");
     commandline_options_load("div_process_commandline");
-    
 }

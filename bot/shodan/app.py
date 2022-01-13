@@ -4,7 +4,6 @@
 #   2 - Instalar o shodan: python3 -m pip install shodan
 #
 # Dados:    {"_id" : "", "project_id" : "", "token" : "", "user" : "",  "shodan_key" : "", "host" : ""};
-
 import os, json, sys, inspect, nmap
 from typing import Protocol;
 
@@ -13,7 +12,7 @@ sys.path.insert(0, os.environ["ROOT"]);
 from api.hacker import *;
 data = sys.stdin.readlines();
 data = json.loads(data[0]);
-#data = {"_id" : "aaaa", "project_id" : "aaa", "token" : "aaaa", "user" : "aaa",  "shodan_key" : "", "host" : "8.8.8.8"};
+#data = {"_id" : "aaaa", "project_id" : "aaa", "token" : "aaaa", "user" : "aaa",  "shodan_key" : "", "host" : "127.0.0.1"};
 
 print('\033[91m', "\t----==== SHODAN ====----", '\033[0m');
 
@@ -22,7 +21,6 @@ from shodan import Shodan
 if data["shodan_key"] == "":
     print("Informe a key shodan");
     exit(1);
-
 
 api = Shodan(data["shodan_key"])
 print('\033[92m', "[+]", '\033[0m', " -", data['host']);
