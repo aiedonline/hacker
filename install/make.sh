@@ -1,4 +1,11 @@
 #!/bin/bash
+#install/make.sh
+# Este script é executado para gerar os arquivos que serão enviados ao servidor
+#       o script limpa diretórios, garante que não seja vazado usuários e senhas de banco
+#       para isso gera um diretório em /etc/hacker com todos os arquivos que devem ser enviados
+#       para a máquina que vai rodar a ferramenta
+#Dúvidas: https://www.cyberframework.online/cyber/project.php?id=5
+
 
 SOURCE=${BASH_SOURCE[0]}
 while [ -h "$SOURCE" ]; do 
@@ -56,6 +63,7 @@ echo '[+] EDB configurado (padrão)';
 rm -r /tmp/hacker/jscloud/editor
 echo '[+] JSCLOUD configurado (padrão)';
 
+rm /tmp/hacker/secanalysis/install/make.sh
 rm -r /tmp/hacker/secanalysis/uploads
 mkdir /tmp/hacker/secanalysis/uploads
 echo '[+] SECANALYSIS configurado (padrão)';
