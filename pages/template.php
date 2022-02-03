@@ -8,7 +8,7 @@
   // se for uma página de administraçòa então deve-se aplicar filtro de IP
   if( count($CONFIG->ip) > 0){
     if ( !in_array($ip, $CONFIG->ip, false)){
-      //error_log("IP não cadastrado: " . $ip, 0);
+      echo "IP não cadastrado: " . $ip;
       die;
     }
   }
@@ -149,11 +149,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
 	
   <?php
-	  //echo '<script src="/'. $SITE . '/js/ckeditor/ckeditor.js?v=1"></script>';
-	  //echo '<script src="/'. $SITE . '/js/ckeditor/config.js?v=1"></script>';
-    echo '<script src="http://www.aied.com.br/linux/js/ckeditor/ckeditor.js?v=2"></script>';
-	  echo '<script src="http://www.aied.com.br/linux/js/ckeditor/config.js?v=2"></script>';
-    
+    echo '<script src="//cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>';
   ?>
   <script src="/secanalysis/js/jsonedit/json-edit.js"></script>
   <link href="/secanalysis/js/jsonedit/json-edit.css" rel="stylesheet" type="text/css" />

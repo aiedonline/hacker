@@ -38,6 +38,7 @@ function nmap_options_load(div){
         AddRadioGroup(div, "rd_nmap_enable", [{"value" : 0, "field" : "Não executar" }, {"value" : 1 , "field" : "Executar"}], "field", "value" , false);
         AddText(div, "text", "Argumentos", "Os argumentos NMAP, acesse livro Hacker entre a luz e as trevas", "txt_nmap_arguments");
         AddRow(div, [8, 4], undefined, "div_nmap_button");
+        
         AddButton("div_nmap_button_1", "Salvar parametros Nmap", "btn_nmap_salvar_click", "btn_nmap_salvar", {"type" : "warning"})
         
         if(saida == undefined){
@@ -75,6 +76,7 @@ function nmap_dominio_options_load(div){
         AddRadioGroup(div, "rd_nmap_domain_enable", [{"value" : 0, "field" : "Não executar" }, {"value" : 1 , "field" : "Executar"}], "field", "value" , false);
         AddText(div, "text", "Argumentos", "Os argumentos NMAP, acesse livro Hacker entre a luz e as trevas", "txt_nmap_domain_arguments");
         AddRow(div, [8, 4], undefined, "div_nmap_domain_button");
+        
         AddButton("div_nmap_domain_button_1", "Salvar parametros Nmap", "btn_nmap_dominio_salvar_click", "btn_nmap_domain_salvar", {"type" : "warning"})
         
         if(saida == undefined){
@@ -97,11 +99,46 @@ function btn_nmap_dominio_salvar_click(){
     });
 }
 
+// ----------=========== DIVERSOS ================-----------------
+function diversos_options_load(div){
+    var DEFAULT_OTHER_ARGUMENTS = JSON.stringify({"dns" : 0, "whois" : 0});
+    EdbRead("project_other_arguments", ["project_id"], [Parameter("id")], function(saida, erro, status){
+        AddHeader(div, 5, "Busca por DNS")
+        AddRadioGroup(div, "rd_dns_enable",   [{"value" : 0, "field" : "Não executar busca por DNS" }, {"value" : 1 , "field" : "Executar busca por DNS"}], "field", "value" , false);
+        //AddBr("div_diversos", 2);
+        AddHeader(div, 5, "Busca por Whois")
+        AddRadioGroup(div, "rd_whois_enable", [{"value" : 0, "field" : "Não executar busca whois" }, {"value" : 1 , "field" : "Executar busca whois"}], "field", "value" , false);
+        
+        AddRow(div, [8, 4], undefined, "div_other_button");
+        AddButton("div_other_button_1", "Salvar parametros Diversos", "btn_other_salvar_click", "btn_other_salvar", {"type" : "warning"})
+        
+        if(saida == undefined){
+            EdbWrite(["project_other_arguments"], [["_id", "project_id", "enable", "arguments"]], [[Parameter("id"), Parameter("id"), 0, DEFAULT_OTHER_ARGUMENTS]], function(saida, status, erro){
+                rd_dns_enable.val(0);
+                rd_whois_enable.val(0);
+            });
+            
+        } else{
+            saida = JSON.parse(saida['arguments']);
+            rd_dns_enable.val(saida['dns']);
+            rd_whois_enable.val(saida['whois']);
+        }
+    });
+}
+
+function btn_other_salvar_click(){
+    EdbWrite(["project_other_arguments"], [["_id", "project_id", "enable", "arguments"]], 
+    [[Parameter("id"), Parameter("id"), 0 , JSON.stringify({"dns" :  rd_dns_enable.val(), "whois" : rd_whois_enable.val()}) ]], function(saida, status, erro){
+        alert("Sucesso");
+    });
+}
+
+
 // --------------------------------------------------------------
 function main_process_run(){
     var div = $("#Process");
     AddTab(div, [{"text" : "Nmap (Ambiente Local)", "div" : "div_process_nmap"}, {"text" : "Nmap (Domínios)", "div" : "div_process_nmap_domain"},
-                    {"text" : "Shodan", "div" : "div_process_shodan"},
+                    {"text" : "Shodan", "div" : "div_process_shodan"}, {"text" : "Diversos", "div" : "div_diversos"},
                     {"text" : "Command line", "div" : "div_process_commandline"}],
      "tab_process_run")
 
@@ -109,4 +146,5 @@ function main_process_run(){
     nmap_dominio_options_load("div_process_nmap_domain");
     shodan_options_load("div_process_shodan");
     commandline_options_load("div_process_commandline");
+    diversos_options_load("div_diversos");
 }
