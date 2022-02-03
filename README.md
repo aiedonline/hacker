@@ -22,3 +22,12 @@
 4 - Execute o comando de instalação:
 
     sudo python3 ./install.py
+
+5 - Acessando a ferramenta
+
+    http://IP_DA_VM/secanalysis/
+    
+    Usuário: root@system
+    Password: 1234
+    
+    
