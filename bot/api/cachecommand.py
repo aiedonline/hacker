@@ -2,7 +2,7 @@ import hashlib, os, sys, subprocess, json, datetime;
 ROOT = os.environ["ROOT"];
 
 class CacheExec():
-    def __init__(self, cache=True, time=1):
+    def __init__(self, cache=True, time=4):
         self.cache = cache;
         self.stdout = None;
         self.stderr = None;
@@ -14,15 +14,18 @@ class CacheExec():
         self.stderr = None;
         self.returncode = None;
 
-    def run(self, args_exec, data=None):
-        key = hashlib.md5("".join(args_exec).encode()).hexdigest();
+    def run(self, args_exec, data=None, key=None):
+        if key == None:
+            key = hashlib.md5("".join(args_exec).encode()).hexdigest();
+        else:
+            key = hashlib.md5(key.encode()).hexdigest();
         buffer = self.cache_load(key);
         if buffer != None:
-            print("[*] From cache");
             self.stdout = buffer['stdout'];
             self.stderr = buffer['stderr'];
             self.returncode = buffer['returncode'];
             return True;
+        
         p = subprocess.Popen(args=args_exec, stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE);
         p_out = None;
         if data != None:
@@ -46,11 +49,11 @@ class CacheExec():
     def cache_save(self, key, value):
         path_to_file = ROOT + "tmp/" + key + "_v_1";
         path_to_temporary = "/tmp/" + key + "_v_1";
-        #with open(path_to_temporary, "w") as f:
-        #    f.write(json.dumps({"time" : (datetime.datetime.utcnow() + datetime.timedelta(hours=self.time)).strftime('%Y-%m-%d %H:%M:%S'), "value" : value }));
-        #    f.close();
-        #    if os.path.exists(path_to_file):
-        #        os.unlink(path_to_file);
-        #    os.rename(path_to_temporary, path_to_file)
+        with open(path_to_temporary, "w") as f:
+            f.write(json.dumps({"time" : (datetime.datetime.utcnow() + datetime.timedelta(hours=self.time)).strftime('%Y-%m-%d %H:%M:%S'), "value" : value }));
+            f.close();
+            if os.path.exists(path_to_file):
+                os.unlink(path_to_file);
+            os.rename(path_to_temporary, path_to_file)
 
 

@@ -8,7 +8,7 @@ from api.hacker import *;
 data = sys.stdin.readlines();
 data = json.loads(data[0]);
 
-machines = ["www", "mail", "ftp", "localhost", "webmail", "smtp", "pop", "cpanel", "ns", "www2", "pop3", "admin", "vpn", "mx",  "imap"];
+machines = ["www", "mail", "ftp", "localhost", "webmail", "smtp", "pop", "cpanel", "ns", "www2", "pop3", "admin", "vpn", "mx",  "imap", "phpmyadmin"];
 
 myquery = dns.resolver.Resolver();
 
@@ -18,9 +18,9 @@ def func_generic(_target, type_ip):
         question = myquery.query(_target, type_ip);
         for _addr in question:
             retorno.append(str(_addr));
-            print('[+] - ' + _target + '---> ' + str(_addr));
+            print('\t\033[92m[+]\033[00m ' + _target + '\033[96m -> ' + str(_addr), "\033[00m");
     except:
-        print('[-] - ' + _target);
+        print('\t\033[91m[-]\033[00m ' + _target);
     return retorno;
     
 def bruteforce_dns_ipv4():

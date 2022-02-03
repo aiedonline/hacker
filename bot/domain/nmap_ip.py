@@ -9,6 +9,10 @@ data = json.loads(data[0]);
 #{'_id': '', 'ip': '208.80.124.13', 'domain_id': ''}
 
 def ports_ip(ip):
+    if ip.get('ip') == None:
+        return;
+    
+    print('\t\033[92m[+] (nmap)\033[00m', ip['ip']);
     n = nmap.PortScanner();
     n.scan(ip["ip"], arguments="-sV");
     envelopes = [];

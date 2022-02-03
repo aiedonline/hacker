@@ -1,8 +1,9 @@
 #!/bin/python3
-#sudo /bin/python3 /var/well/hacker/bot/app.py -s '127.0.0.1' -p '9e424a98-7ef4-d865-40f6-ebb439931f44' -t 'e8fd6417-cfa8-4b0d-a662-0de4a2d3c204' -u 'c308f6804bdd1a856355d3a34113f22a5d5f799b'
 
-import argparse, subprocess, json, time, traceback, sys, os, inspect
 
+import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime;
+
+# ============================ IMPORTAÇOES EM GERAL =====================================
 ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/";
 os.environ["ROOT"] = ROOT;
 sys.path.insert(0,ROOT);
@@ -10,12 +11,25 @@ sys.path.insert(0,ROOT);
 from api.cachecommand import *;
 from threading import Thread
 from api.hacker import *;
+from pyfiglet import Figlet;
 
-def run_commands(script, dados_de_input):
+# ============================= ROTINAS DE APOIO ====================================
+
+def install_dependence(dependence):
+    sub = subprocess.run(["python3", os.environ["ROOT"] + "/api/module.py", dependence['name']]);
+    if sub.returncode != 0:
+        print("[*] Install: ",  dependence['install']);
+        subprocess.run(["python3", "-m", "pip", "install", dependence['install']]);
+
+def run_commands(script, dados_de_input, dependencias=[], key=None, time=1):
+    for dependencia in dependencias:
+        install_dependence(dependencia);
     ex = CacheExec();
-    ex.run(["python3", os.environ["ROOT"] + script], dados_de_input);
-    print(ex.stdout, '\033[91m', ex.stderr);
+    ex.run(["python3", os.environ["ROOT"] + script], dados_de_input, key=key);
+    if ex.stderr.strip() != "" or ex.stdout.strip() != "":
+        print(ex.stdout, '\033[91m', ex.stderr, end="");
 
+# ============================ ARGUMENTOS SENDO PROCESSADOS =========================
 ap = argparse.ArgumentParser();
 ap.add_argument("-s", "--server",  required=True, help="IP do server");
 ap.add_argument("-p", "--project", required=True, help="_id do projeto");
@@ -23,71 +37,106 @@ ap.add_argument("-t", "--token",   required=True, help="Chave gerada para o proj
 ap.add_argument("-u", "--user",    required=True, help="Código do usuário");
 args = vars(ap.parse_args())
 
+# =============================== VARIAVEIS E VALORES ==========================
+
+VERSION = "0.1";
+DATA_INICIO = datetime.datetime.now();
+
+# =============================== BANNER E ABERTURA ================================
+
+f = Figlet(font="slant");
+print("\033[93m");
+print( f.renderText("SecAnalysis BOT") );
+print("\033[00m");
+# Nome do produto, versão e site do produto
+print("\033[96m\033[1m", "SecAnalysis", "\033[00m", "v." + VERSION, "https://www.cyberframewor.online/cyber/", "\n");
+
+
+# =============================== EXECUÇÒES =======================================
 dados_json = {"project_id" : args["project"], "token" : args["token"],  "user" : args["user"]};
 projeto = SendService(args["server"], "project.php", dados_json );
-
-#{'project': {'_id': '', '_user': '', 'nome': '', 'descricao': '', 'token': ''}, 
-#      'nmap': {'arguments': {'_id': ''}, 'lans': []}}
-
-#{'project': {'_id': '', '_user': '', 'nome': '',  'descricao': '', 'token': ''}, 
-# 'nmap': {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}}
 
 def nmap_switch(server_ip, user, token, nmap_json):
     # nmap_json = {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}
     # lans [{"_id":"","name":"","_user":"","ambiente_id":"","address":"","mask":""}]
     for lan in nmap_json['lans']:
         envelop_nmap = {"server_ip" : server_ip, "address" : lan['address'], "mask" : lan['mask'], "arguments" : nmap_json['arguments']['arguments'], "lan_id" : lan["_id" ], "project_id" : nmap_json['arguments']["project_id" ], "user" : user, "token" : token };
-        Thread(target = run_commands, args = ("network/nmap_scanner.py", envelop_nmap,  )).start();
-
+        #Thread(target = run_commands, args = ("network/nmap_scanner.py", envelop_nmap,  )).start();
+        run_commands("network/nmap_scanner.py", envelop_nmap, key=("network/nmap_scanner.py" + envelop_nmap['address']));
 def nmap_domain_switch(server_ip, user, token, nmap_json):
+    if len(nmap_json['ips']) == 0:
+        return;
+    
+    print('\033[91m\033[1m', "Run nmap in Domain:", '\033[00m');
     for ip in nmap_json['ips']:
         ip["server_ip"] = server_ip;
         ip["user"] = user;
         ip["token"] = token;
         ip["project_id"] = args["project"];
-        Thread(target = run_commands, args = ("domain/nmap_ip.py", ip,  )).start();
-
+        run_commands("domain/nmap_ip.py", ip, key=("domain/nmap_ip.py" + ip['ip']));
+        #Thread(target = run_commands, args = ("domain/nmap_ip.py", ip,  )).start();
 
 def shodan_switch(server_ip, user, token, shodan_json):
-    for i in range(len( shodan_json['hosts'])):
+    if shodan_json['shodan_key'] == None or shodan_json['shodan_key'] == "":
+        print("\033[94m\033[1mInforme a key shodan\033[00m");
+        return;
+    if len(shodan_json['hosts']) == 0:
+        return;
+    
+    print('\033[91m\033[1m', "Run Shodan.io:", '\033[00m');
+    for i in range(len( shodan_json['hosts'])):   
         host = shodan_json['hosts'][i];
         if host== None or host.get("ip") == None:
             continue;
+        
         envelop = {"server_ip" : server_ip, "shodan_key" : shodan_json['shodan_key'], "_id" : host["_id"],  "host" : host["ip"], "project_id" : args["project"], "user" : user, "token" : token };
-        run_commands("shodan/app.py", envelop);
+        run_commands("shodan/app.py", envelop, key=("shodan/app.py_" + host["_id"]));
 
 def whois_switch(server_ip, user, token, whois_json):
+    if len(whois_json['domains']) == 0:
+        return;
+    
+    print('\033[91m\033[1m', "Run Search Whois:", '\033[00m');
     for domain in  whois_json['domains']:
         domain["server_ip"] = server_ip;
         domain["user"] = user;
-        run_commands("domain/whois_ips.py", domain);
+        run_commands("domain/whois_ips.py", domain,[{"name" : "whois", "install" : "python-whois"}], key=("domain/whois_ips.py_" + domain["domain"]));
 
 def dns_switch(server_ip, user, token, whois_json):
+    if len(whois_json['domains']) == 0:
+        return;
+    print('\033[91m\033[1m', "Run Search DNS IP:", '\033[00m');
     for domain in  whois_json['domains']:
         domain["server_ip"] = server_ip;
         domain["user"] = user;
-        run_commands("domain/dns_ips.py", domain);
+        run_commands("domain/dns_ips.py", domain, key=("domain/dns_ips.py" + domain["domain"]  ));
 
 # TEMOS QUE COLOCAR ANTES DE RODAR IS SCRIPTS UMA DESCRIÇÀO DO QUE VAI SER RODADO
 #     POIS UM SCRIPT PODE DEMORAR E ACABAR DEIXANDO O USUÁRIO NA DÚVIDA.
-print('\033[91m', "\t----==== BOT SECANALYSIS ====----", '\033[0m');
-if projeto.get('nmap') != None and projeto['nmap'].get("enable") != None and projeto['nmap']["enable"] == "1":
-    print("\033[92m -> Run:\033[0m Nmap in LAN");
-if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable") != None and projeto['nmap_domain']["arguments"]["enable"] == "1":
-    print("\033[92m -> Run:\033[0m Nmap in Domains");
-if projeto.get('shodan') != None and projeto['shodan'].get("enable") != None and projeto['shodan']["enable"] == "1":
-    print("\033[92m -> Run:\033[0m Shodan in domains");
-#print(projeto);
+print('\033[91m\033[1m', "Routine:", '\033[00m');
+print("\t-> Search Whois", "\t-> Search DNS IP", sep="\n");
 
-print('\033[91m', "\t----==== START ====----", '\033[0m');
+if projeto.get('nmap') != None and projeto['nmap'].get("enable") != None and projeto['nmap']["enable"] == "1":
+    print("\t-> Run nmap in LAN");
+if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable") != None and projeto['nmap_domain']["arguments"]["enable"] == "1":
+    print("\t-> Run nmap in Domain");
+if projeto.get('shodan') != None and projeto['shodan'].get("enable") != None and projeto['shodan']["enable"] == "1":
+    print("\t-> Run Shodan.io");
+
 whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
 dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
-
 if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable") != None and projeto['nmap_domain']["arguments"]["enable"] == "1":
-    Thread(target=nmap_domain_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap_domain'  ], ) ).start();
+    #Thread(target=nmap_domain_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap_domain'  ], ) ).start();
+    nmap_domain_switch(args["server"], args["user"], args["token"], projeto['nmap_domain'  ]);
 if projeto.get('nmap') != None and projeto['nmap'].get("enable") != None and projeto['nmap']["enable"] == "1":
-    Thread(target=nmap_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap'  ], ) ).start();
+    #Thread(target=nmap_switch,   args=(args["server"], args["user"], args["token"], projeto['nmap'  ], ) ).start();
+    nmap_switch(args["server"], args["user"], args["token"], projeto['nmap'  ]);
 if projeto.get('shodan') != None and projeto['shodan'].get("enable") != None and projeto['shodan']["enable"] == "1":
-    Thread(target=shodan_switch, args=(args["server"], args["user"], args["token"], projeto['shodan'], ) ).start();
+    #Thread(target=shodan_switch, args=(args["server"], args["user"], args["token"], projeto['shodan'], ) ).start();
+    shodan_switch(args["server"], args["user"], args["token"], projeto['shodan']);
 
-print('\033[91m', "\t----==== END ====----", '\033[0m');
+# ============================ RELATÓRIO FINAL =============================
+
+DATA_FINALIZACAO = datetime.datetime.now();
+DIFERENCA = DATA_FINALIZACAO - DATA_INICIO;
+print("\nProcedimento executado em: ", (DIFERENCA.seconds // 60), "minuto(s) e", (DIFERENCA.seconds % 60), "segundo(s)");

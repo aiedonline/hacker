@@ -13,8 +13,6 @@ if os.geteuid() != 0:
     print("O usuário não é ROOT");
     sys.exit(1);
 
-
-
 def install_dependence(dependence):
     sub = subprocess.run(["python3", CURRENT + "/install_test_module.py", dependence['name']]);
     if sub.returncode != 0:

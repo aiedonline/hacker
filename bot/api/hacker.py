@@ -7,7 +7,6 @@ def SendService(host, page, data):
             envelope[key] = value;
         url = "http://" + host + "/secanalysis/service/" + page;
         buffer_connection = requests.post(url, json=envelope);
-        #print(buffer_connection.text);
         return buffer_connection.json();
     except Exception as e:
         traceback.print_exc();
