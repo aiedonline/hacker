@@ -14,8 +14,9 @@
 
 3 - Obter arquivo de instalação:
 
-    curl https://www.cyberframework.online/cyber/projects/5/download/install.tar.xz --output /tmp/install.tar.xz 
-    tar -xf /tmp/install.tar.xz -C /tmp/
+    curl https://www.cyberframework.online/cyber/projects/5/download/install.tar.gz --output /tmp/install.tar.gz
+    mkdir /tmp/install
+    tar -zxvf /tmp/install.tar.gz -C /tmp/
     cd /tmp/install/
 
 4 - Execute o comando de instalação:
