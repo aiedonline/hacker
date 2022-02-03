@@ -1,4 +1,4 @@
-# hacker
+# Painel SecAnalysis hacker
 
 1 - Primeiro precisa instalar o MariaDB;
 
@@ -29,5 +29,11 @@
     
     Usuário: root@system
     Password: 1234
-    
-    
+ 
+# Bot SecAnalysis
+
+    sudo apt install python3-pip -y
+    sudo python3 -m pip install pyfiglet
+
+
+
