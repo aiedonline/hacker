@@ -65,6 +65,7 @@ echo '[+] JSCLOUD configurado (padrão)';
 
 rm /tmp/hacker/secanalysis/install/make.sh
 rm -r /tmp/hacker/secanalysis/uploads
+rm -r /tmp/hacker/secanalysis/inistall
 mkdir /tmp/hacker/secanalysis/uploads
 echo '[+] SECANALYSIS configurado (padrão)';
 
