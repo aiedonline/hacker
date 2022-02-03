@@ -34,6 +34,8 @@
 
     sudo apt install python3-pip -y
     sudo python3 -m pip install pyfiglet
+    sudo apt install nmap -y
+
 
 
 
