@@ -28,6 +28,10 @@ if [ -d "/tmp/hacker" ]; then
   rm -r /tmp/hacker;
 fi
 
+if [ -d "/tmp/install" ]; then
+  rm -r /tmp/install;
+fi
+
 mkdir /tmp/hacker;
 echo '[+] Diretórios criado';
 
@@ -63,12 +67,21 @@ echo '[+] EDB configurado (padrão)';
 rm -r /tmp/hacker/jscloud/editor
 echo '[+] JSCLOUD configurado (padrão)';
 
-rm /tmp/hacker/secanalysis/install/make.sh
+rm -r /tmp/hacker/secanalysis/install
 rm -r /tmp/hacker/secanalysis/uploads
 rm -r /tmp/hacker/secanalysis/inistall
 mkdir /tmp/hacker/secanalysis/uploads
 echo '[+] SECANALYSIS configurado (padrão)';
 
+cp -r "$DIR_PROJECT/secanalysis/install" /tmp/
+rm -r /tmp/install/make.sh
+cd /tmp/install
+tar -zcvf /tmp/install.tar.gz .
+echo '[+] INSTALADOR GERADO';
 
+cd /tmp/hacker
+tar -zcvf /tmp/hacker.tar.gz .
+echo '[+] PACOTES GERADOS';
 
-
+rm -r /tmp/hacker
+rm -r /tmp/install

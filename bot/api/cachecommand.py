@@ -1,4 +1,7 @@
-import hashlib, os, sys, subprocess, json, datetime;
+import hashlib, os, sys, subprocess, json, datetime, signal, time;
+
+from threading import Thread
+
 ROOT = os.environ["ROOT"];
 
 class CacheExec():
@@ -14,7 +17,15 @@ class CacheExec():
         self.stderr = None;
         self.returncode = None;
 
-    def run(self, args_exec, data=None, key=None):
+    def stop_command(self, timeout, proc):
+        try:
+            time.sleep(60 * timeout);
+            print("\t\t\033[96mParar processo, já passou ", timeout, "\033[00m");
+            os.kill(proc.pid, signal.SIGINT);
+        except:
+            ignorar = ""; # kkkkk
+
+    def run(self, args_exec, data=None, key=None, timeout=2):
         if key == None:
             key = hashlib.md5("".join(args_exec).encode()).hexdigest();
         else:
@@ -25,18 +36,27 @@ class CacheExec():
             self.stderr = buffer['stderr'];
             self.returncode = buffer['returncode'];
             return True;
-        
-        p = subprocess.Popen(args=args_exec, stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE);
-        p_out = None;
-        if data != None:
-            p_out = p.communicate(input=json.dumps(data).encode('utf-8'));
-        else:
-             p_out = p.communicate();
-        self.stdout = str(p_out[0], 'utf-8');
-        self.stderr = str(p_out[1], 'utf-8');
-        self.returncode = p.returncode;
-        self.cache_save(key, {"returncode" : p.returncode, "stdout" : str(p_out[0], 'utf-8'), "stderr" : str(p_out[1], 'utf-8')});
-        return p.returncode;
+        try:
+            p = subprocess.Popen(args=args_exec, stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE);
+            t = Thread(target=self.stop_command,   args=(timeout, p,  ) ).start();
+            p_out = None;
+            if data != None:
+                p_out = p.communicate(input=json.dumps(data).encode('utf-8'));
+            else:
+                p_out = p.communicate();
+            self.stdout = str(p_out[0], 'utf-8');
+            self.stderr = str(p_out[1], 'utf-8');
+            self.returncode = p.returncode;
+            if self.returncode == 0:
+                self.cache_save(key, {"returncode" : p.returncode, "stdout" : str(p_out[0], 'utf-8'), "stderr" : str(p_out[1], 'utf-8')});
+            try:
+                t.terminate();
+            except:
+                print("Problemas em parar a thread de Timeout.");
+            return p.returncode;
+        except KeyboardInterrupt:
+            return 1;
+        return 2;
 
     def cache_load(self, key):
         path_to_file = ROOT + "tmp/" + key + "_v_1";

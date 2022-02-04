@@ -5,7 +5,6 @@
 #
 # Dados:    {"_id" : "", "project_id" : "", "token" : "", "user" : "",  "shodan_key" : "", "host" : ""};
 import os, json, sys, inspect, nmap
-from typing import Protocol;
 
 sys.path.insert(0, os.environ["ROOT"]);
 

@@ -15,21 +15,22 @@ def ports_ip(ip):
     print('\t\033[92m[+] (nmap)\033[00m', ip['ip']);
     n = nmap.PortScanner();
     n.scan(ip["ip"], arguments="-sV");
-    envelopes = [];
-    if n._scan_result['scan'].get(ip['ip']) == None:
-        return None;
-    if n._scan_result['scan'][ip['ip']].get("tcp") != None :
-        for key, value in n._scan_result['scan'][ip['ip']]["tcp"].items():
-            envelope = {"port" : key, "evidence" : json.dumps(value), "ip" : ip["ip"], "ip_id" : ip["_id"], "protocol" : "tcp",
+    if hasattr(n, '_scan_result'):
+        envelopes = [];
+        if n._scan_result['scan'].get(ip['ip']) == None:
+            return None;
+        if n._scan_result['scan'][ip['ip']].get("tcp") != None :
+            for key, value in n._scan_result['scan'][ip['ip']]["tcp"].items():
+                envelope = {"port" : key, "evidence" : json.dumps(value), "ip" : ip["ip"], "ip_id" : ip["_id"], "protocol" : "tcp",
+                    "project_id" : ip["project_id"], "token" : ip["token"], "user" : ip["user"]};
+                envelopes.append(envelope);
+        if n._scan_result['scan'][ip['ip']].get("udp") != None :
+            for key, value in n._scan_result['scan'][ip["ip"]]["udp"].items():
+                envelope = {"port" : key, "evidence" : json.dumps(value), "ip" : ip["ip"], "ip_id" : ip["_id"], "protocol" : "udp",
                 "project_id" : ip["project_id"], "token" : ip["token"], "user" : ip["user"]};
-            envelopes.append(envelope);
-    if n._scan_result['scan'][ip['ip']].get("udp") != None :
-        for key, value in n._scan_result['scan'][ip["ip"]]["udp"].items():
-            envelope = {"port" : key, "evidence" : json.dumps(value), "ip" : ip["ip"], "ip_id" : ip["_id"], "protocol" : "udp",
-            "project_id" : ip["project_id"], "token" : ip["token"], "user" : ip["user"]};
-            envelopes.append(envelope);
-    
-    for envelope in envelopes:
-        retorno = SendService(ip["server_ip"], "add_ip_port.php", envelope);
+                envelopes.append(envelope);
+        
+        for envelope in envelopes:
+            retorno = SendService(ip["server_ip"], "add_ip_port.php", envelope);
 
 ports_ip(data);
