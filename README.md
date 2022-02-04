@@ -1,4 +1,4 @@
-# hacker
+# Painel SecAnalysis hacker
 
 1 - Primeiro precisa instalar o MariaDB;
 
@@ -16,9 +16,26 @@
 
     curl https://www.cyberframework.online/cyber/projects/5/download/install.tar.gz --output /tmp/install.tar.gz
     mkdir /tmp/install
-    tar -zxvf /tmp/install.tar.gz -C /tmp/
+    tar -zxvf /tmp/install.tar.gz -C /tmp/install/
     cd /tmp/install/
 
 4 - Execute o comando de instalação:
 
     sudo python3 ./install.py
+
+5 - Acessando a ferramenta
+
+    http://IP_DA_VM/secanalysis/
+    
+    Usuário: root@system
+    Password: 1234
+ 
+# Bot SecAnalysis
+
+    sudo apt install python3-pip -y
+    sudo python3 -m pip install pyfiglet
+    sudo apt install nmap -y
+
+
+
+
