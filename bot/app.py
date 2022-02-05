@@ -1,6 +1,4 @@
 #!/bin/python3
-
-
 import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime;
 
 # ============================ IMPORTAÇOES EM GERAL =====================================
@@ -39,7 +37,7 @@ args = vars(ap.parse_args())
 
 # =============================== VARIAVEIS E VALORES ==========================
 
-VERSION = "0.1";
+VERSION = "0.2";
 DATA_INICIO = datetime.datetime.now();
 threads = [];
 # =============================== BANNER E ABERTURA ================================
