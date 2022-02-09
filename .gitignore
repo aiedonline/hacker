@@ -14,3 +14,4 @@ bot/tmp
 *__pycache__*
 *tmp*
 bot/api/__pycache__/
+uploads/
