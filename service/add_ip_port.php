@@ -22,7 +22,7 @@ $post_data = json_decode(file_get_contents('php://input'), true);
 $retorno = Database::Write(["ip_port"], [["_id",         "port",                  "evidence",       "ip_id",                "protocol"]], 
             [[$post_data["ip_id"] . strval($post_data["port"]), $post_data["port"],  $post_data["evidence"],  $post_data["ip_id"], $post_data["protocol"]]], "", 
             $cache=false, $user=$post_data["user"]);
-error_log(json_encode($retorno), 0);
+
 echo json_encode($retorno);
 
 // _id, port, evidence, ip_id, , date_create, protocol, _user, ,

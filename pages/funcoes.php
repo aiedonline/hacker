@@ -112,7 +112,7 @@ function file_get_contents_res($url){
 	));
 	$response = file_get_contents($url, false, $context);
 	if($response === false){
-		//error_log("Falha na conexão local.");
+		
 		die('Error');
 	} else {
 		file_put_contents($file_cache_name, $response);

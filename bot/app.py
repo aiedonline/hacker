@@ -1,5 +1,5 @@
 #!/bin/python3
-import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime;
+import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime, uuid;
 
 # ============================ IMPORTAÇOES EM GERAL =====================================
 ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/";
@@ -11,6 +11,7 @@ from threading import Thread
 from api.hacker import *;
 from pyfiglet import Figlet;
 
+
 # ============================= ROTINAS DE APOIO ====================================
 
 def install_dependence(dependence):
@@ -19,13 +20,19 @@ def install_dependence(dependence):
         print("[*] Install: ",  dependence['install']);
         subprocess.run(["python3", "-m", "pip", "install", dependence['install']]);
 
-def run_commands(script, dados_de_input, dependencias=[], timeout=1, key=None, time=1):
+# Retorna um CacheExec
+def run_commands(script, dados_de_input, dependencias=[], timeout=3, key=None, time=1):
+    global stderr, stdout;
     for dependencia in dependencias:
         install_dependence(dependencia);
     ex = CacheExec();
     ex.run(["python3", os.environ["ROOT"] + script], dados_de_input, key=key, timeout=timeout);
     if ex.stderr.strip() != "" or ex.stdout.strip() != "":
         print(ex.stdout, '\033[91m', ex.stderr, end="");
+    
+    stdout += script.upper() + "\n" +  ex.stdout + "\n\n";
+    stderr += script.upper() + "\n" +  ex.stderr+ "\n\n";
+    return ex;
 
 # ============================ ARGUMENTOS SENDO PROCESSADOS =========================
 ap = argparse.ArgumentParser();
@@ -40,6 +47,8 @@ args = vars(ap.parse_args())
 VERSION = "0.2";
 DATA_INICIO = datetime.datetime.now();
 threads = [];
+stdout = ""; stderr = "";
+EXEC_ID = str( uuid.uuid4() );
 # =============================== BANNER E ABERTURA ================================
 
 f = Figlet(font="slant");
@@ -53,8 +62,6 @@ print("\033[96m\033[1m", "SecAnalysis", "\033[00m", "v." + VERSION, "https://www
 # =============================== EXECUÇÒES =======================================
 dados_json = {"project_id" : args["project"], "token" : args["token"],  "user" : args["user"]};
 projeto = SendService(args["server"], "project.php", dados_json );
-
-#print(json.dumps(projeto));
 
 def nmap_switch(server_ip, user, token, nmap_json):
     # nmap_json = {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}
@@ -78,9 +85,6 @@ def nmap_domain_switch(server_ip, user, token, nmap_json):
         ip["token"] = token;
         ip["project_id"] = args["project"];
         run_commands("domain/nmap_ip.py", ip, dependencias=[{"name" : "nmap", "install" : "python-nmap"}], key=("domain/nmap_ip.py" + ip['ip']));
-        #buffer = Thread(target = run_commands, args = ("domain/nmap_ip.py", ip,  ));
-        #threads.append(buffer);
-        #buffer.start();
 
 def shodan_switch(server_ip, user, token, shodan_json):
     if shodan_json['shodan_key'] == None or shodan_json['shodan_key'] == "":
@@ -117,40 +121,47 @@ def dns_switch(server_ip, user, token, whois_json):
         domain["user"] = user;
         run_commands("domain/dns_ips.py", domain, dependencias=[{"name" : "dns", "install" : "dnspython"}] ,key=("domain/dns_ips.py" + domain["domain"]  ));
 
-# TEMOS QUE COLOCAR ANTES DE RODAR IS SCRIPTS UMA DESCRIÇÀO DO QUE VAI SER RODADO
-#     POIS UM SCRIPT PODE DEMORAR E ACABAR DEIXANDO O USUÁRIO NA DÚVIDA.
-print('\033[91m\033[1m', "Routine:", '\033[00m');
-print("\t-> Search Whois", "\t-> Search DNS IP", sep="\n");
+try:
+    # INSERT NA TABELA execution COM PROJECT_ID
+    envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args["token"], "action" : "start" };
+    retorno = SendService(args["server"], "exec.php", envelope);
 
-if projeto.get('nmap') != None and projeto['nmap']['arguments'].get("enable")  == "1":
-    print("\t-> Run nmap in LAN");
-if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable")  == "1":
-    print("\t-> Run nmap in Domain");
-if projeto.get('shodan') != None and projeto['shodan'].get("enable") == "1":
-    print("\t-> Run Shodan.io");
+    # TEMOS QUE COLOCAR ANTES DE RODAR IS SCRIPTS UMA DESCRIÇÀO DO QUE VAI SER RODADO
+    #     POIS UM SCRIPT PODE DEMORAR E ACABAR DEIXANDO O USUÁRIO NA DÚVIDA.
+    print('\033[91m\033[1m', "Routine:", '\033[00m');
+    print("\t-> Search Whois", "\t-> Search DNS IP", sep="\n");
 
-#whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
-#dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
+    if projeto.get('nmap') != None and projeto['nmap']['arguments'].get("enable")  == "1":
+        print("\t-> Run nmap in LAN");
+    if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable")  == "1":
+        print("\t-> Run nmap in Domain");
+    if projeto.get('shodan') != None and projeto['shodan'].get("enable") == "1":
+        print("\t-> Run Shodan.io");
 
-print(projeto['nmap']['arguments'].get("enable"));
-print(projeto['nmap_domain']["arguments"].get("enable"));
-print(projeto['shodan']["enable"]);
+    buffer_exec = whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
+    buffer_exec = dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
 
-if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable")  == "1":
-    nmap_domain_switch(args["server"], args["user"], args["token"], projeto['nmap_domain'  ]);
-if projeto.get('nmap') != None and projeto['nmap']['arguments'].get("enable")  == "1":
-    nmap_switch(args["server"], args["user"], args["token"], projeto['nmap'  ]);
-if projeto.get('shodan') != None and projeto['shodan'].get("enable")  == "1":
-    shodan_switch(args["server"], args["user"], args["token"], projeto['shodan']);
+    if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable")  == "1":
+        buffer_exec = nmap_domain_switch(args["server"], args["user"], args["token"], projeto['nmap_domain'  ]);
+    if projeto.get('nmap') != None and projeto['nmap']['arguments'].get("enable")  == "1":
+        buffer_exec = nmap_switch(args["server"], args["user"], args["token"], projeto['nmap'  ]);
+    if projeto.get('shodan') != None and projeto['shodan'].get("enable")  == "1":
+        buffer_exec = shodan_switch(args["server"], args["user"], args["token"], projeto['shodan']);
 
-# ============================ RELATÓRIO FINAL =============================
+    # ============================ RELATÓRIO FINAL =============================
 
-DATA_FINALIZACAO = datetime.datetime.now();
-DIFERENCA = DATA_FINALIZACAO - DATA_INICIO;
+    DATA_FINALIZACAO = datetime.datetime.now();
+    DIFERENCA = DATA_FINALIZACAO - DATA_INICIO;
+    for t in threads:
+        t.join();
+    print("\nProcedimento executado em: ", (DIFERENCA.seconds // 60), "minuto(s) e", (DIFERENCA.seconds % 60), "segundo(s)", '\033[0m');
+    # UPDATE NA TABELA execution COM PROJECT_ID
+    envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args['token'], "stdout" : stdout, "stderr" : stderr, "status_code" : "0",  "action" : "sucess" };
+    retorno = SendService(args["server"], "exec.php", envelope); 
+except:
+    traceback.print_exc();
+    # UPDATE NA TABELA execution COM PROJECT_ID
+    envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args['token'], "stdout" : stdout, "stderr" : stderr, "status_code" : "1",  "action" : "error" };
+    retorno = SendService(args["server"], "exec.php", envelope);
 
-print("Threads agendadas....");
-for t in threads:
-    t.join();
-print("\nProcedimento executado em: ", (DIFERENCA.seconds // 60), "minuto(s) e", (DIFERENCA.seconds % 60), "segundo(s)", '\033[0m');
 sys.exit(0);
-

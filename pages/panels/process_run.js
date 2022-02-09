@@ -31,6 +31,49 @@ function btn_shodan_salvar_click(){
 
 }
 
+// ----------========== EXECUÇOES ======================---------------------
+function update_execution_log(){
+    if( $("#tbl_executions").length > 0 ){
+        $("#tbl_executions").remove();
+    }
+
+    EdbList("execution", [], [], function(){}, undefined, undefined, function(data, status, erro) {
+        if(data == undefined){
+            return;
+        }
+        AddRowTable("div_execution_commandline", [{"field" : "date_execution", "text" : "Data Execução"}, {"field" : "ip", "text" : "IP do cliente"}, {"field" : "status", "text" : "Status"},  {"field" : "status_code", "text" : "Código de saída"}],
+             data, "tbl_executions", function (row, key, value, data, j , i){
+                 if(value == null) return "";
+                 if(key == "status"){
+                     if(value == 0){
+                        return "Em execução";
+                     } else {
+                         return "Finalizado";
+                     }
+                 }
+                 return "<a href='JavaScript:AbrirLog(\""+ Base64Encode( JSON.stringify(data) ) +"\")'>"+ value +"</a>";
+             })
+    }, cache, {"order" : [{"field" : "date_execution", "order" : "desc"}]});
+}
+function execucoes_load(div){
+
+    AddRow(div, [8, 4], undefined, "div_execute_panel_row");
+    AddButton("div_execute_panel_row_1", "Atualizar Lista", "btn_update_execute_salvar_click", "btn_update_execute_salvar", {})
+    update_execution_log();
+}
+
+function btn_update_execute_salvar_click(){
+    update_execution_log();
+}
+
+function AbrirLog(dados){
+    var dados = JSON.parse( Base64Decode(dados) );
+    div = AddModal("raiz", "Adicionar", function(){
+		
+	}, function(){} , "div_show_output");
+    div.html(dados.stdout.replaceAll("\n", "<br/>") + " - " + dados.stderr.replaceAll("\n", "<br/>"));
+}
+
 // ----------=========== NMAP AMBIENTE ================-----------------
 function nmap_options_load(div){
     var DEFAULT_NMAP_ARGUMENTS = "-sV -O"
@@ -139,7 +182,7 @@ function main_process_run(){
     var div = $("#Process");
     AddTab(div, [{"text" : "Nmap (Ambiente Local)", "div" : "div_process_nmap"}, {"text" : "Nmap (Domínios)", "div" : "div_process_nmap_domain"},
                     {"text" : "Shodan", "div" : "div_process_shodan"}, {"text" : "Diversos", "div" : "div_diversos"},
-                    {"text" : "Command line", "div" : "div_process_commandline"}],
+                    {"text" : "Command line", "div" : "div_process_commandline"}, {"text" : "Execuções", "div" : "div_execution_commandline"}],
      "tab_process_run")
 
     nmap_options_load("div_process_nmap");
@@ -147,4 +190,5 @@ function main_process_run(){
     shodan_options_load("div_process_shodan");
     commandline_options_load("div_process_commandline");
     diversos_options_load("div_diversos");
+    execucoes_load("div_execution_commandline");
 }

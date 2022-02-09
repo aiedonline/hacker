@@ -22,7 +22,7 @@ $post_data = json_decode(file_get_contents('php://input'), true);
 $retorno = Database::Write(["ip"], [["_id", "ip", "geo",                 "shodan",             "script_version"]], 
             [[$post_data["_id"], $post_data["host"],  $post_data["geo"], $post_data["shodan"],   "1"]], "", 
             $cache=false, $user=$post_data["user"]);
-//error_log(json_encode($retorno), 0);
+
 echo json_encode($retorno);
 
 //_id, ip, geo, domain_id, shodan, script_version, _user, ,

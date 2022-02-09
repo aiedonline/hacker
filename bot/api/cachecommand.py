@@ -5,12 +5,14 @@ from threading import Thread
 ROOT = os.environ["ROOT"];
 
 class CacheExec():
-    def __init__(self, cache=True, time=4):
+    def __init__(self, cache=True, time=4, log_stdout="", log_stderr=""):
         self.cache = cache;
         self.stdout = None;
         self.stderr = None;
         self.returncode = None;
         self.time = time;
+        self.log_stdout = log_stdout;
+        self.log_stderr = log_stderr;
     
     def erase(self):
         self.stdout = None;
@@ -20,7 +22,7 @@ class CacheExec():
     def stop_command(self, timeout, proc):
         try:
             time.sleep(60 * timeout);
-            print("\t\t\033[96mParar processo, já passou ", timeout, "\033[00m");
+            #print("\t\t\033[96mParar processo, já passou ", timeout, "\033[00m");
             os.kill(proc.pid, signal.SIGINT);
         except:
             ignorar = ""; # kkkkk
@@ -34,6 +36,8 @@ class CacheExec():
         if buffer != None:
             self.stdout = buffer['stdout'];
             self.stderr = buffer['stderr'];
+            self.log_stdout += self.stdout;
+            self.log_stderr += self.stderr;
             self.returncode = buffer['returncode'];
             return True;
         try:
@@ -46,13 +50,15 @@ class CacheExec():
                 p_out = p.communicate();
             self.stdout = str(p_out[0], 'utf-8');
             self.stderr = str(p_out[1], 'utf-8');
+            self.log_stdout += self.stdout;
+            self.log_stderr += self.stderr;
             self.returncode = p.returncode;
             if self.returncode == 0:
                 self.cache_save(key, {"returncode" : p.returncode, "stdout" : str(p_out[0], 'utf-8'), "stderr" : str(p_out[1], 'utf-8')});
             try:
                 t.terminate();
             except:
-                print("Problemas em parar a thread de Timeout.");
+                a = "";
             return p.returncode;
         except KeyboardInterrupt:
             return 1;

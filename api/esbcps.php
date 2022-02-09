@@ -32,14 +32,14 @@ class Barramento {
 
 			// Send the request
 			$response = file_get_contents('http://esbprov2.azurewebsites.net/services/bus', FALSE, $context);
-			error_log($response, 0);
+			
 			// Check for errors
 			if($response === FALSE){
 				die('Error');
 			}
 			
 			try{ // try para tratar só a conversao do json, alguns serviços podem retornar um texto para o genexus
-				error_log("ESB: " . $response, 0);
+				
 				$buffer_js = json_decode($response, TRUE);
 				if($buffer_js['status'] == 1){
 					return $buffer_js['data'];

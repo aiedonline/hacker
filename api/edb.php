@@ -91,7 +91,7 @@ class Database {
 
             // Send the request
             $response = file_get_contents($CONFIG->edb . "execute.php", false, $context);
-            error_log($response, 0);
+            
             // Check for errors
             if($response === false){
                 die('Error');
@@ -240,7 +240,7 @@ class Database {
             // Send the request
             $response = file_get_contents($CONFIG->edb . "execute.php", false, $context);
             // Check for errors
-            error_log($response, 0);
+            
             if($response === false){
                 die('Error');
             }
@@ -360,9 +360,7 @@ class Database {
     }
 
     public static function Procedure($entity, $keys, $values, $cache=false, $user=null){
-        //if($user == null){
-            //error_log('Falta usuário para leitura da entidade: ' . $entity, 0);
-        //}
+        
         $data_send = [];
         $query = array();
         for($i = 0; $i < count($keys); $i++){
@@ -437,9 +435,7 @@ class Database {
 
 
     public static function Page($entity, $keys, $values, $name, $page, $records, $user=null, $order=[ array("field" => "_id", "order" => "asc") ]){
-        //if($user == null){
-        //    error_log('Falta usuário para leitura da entidade: ' . $entity, 0);
-        //}
+        
 		if(session_exist('user_cookie')) {
 			 $user =  json_decode(session_load('user_cookie'), true)['_id'];
 		}
@@ -488,7 +484,7 @@ class Database {
             
             $response = file_get_contents($CONFIG->edb . "dictionary/execute.php", false, $context);
             // Check for errors
-            error_log($response, 0);
+            
             if($response === false){
 
                 die('Error');
@@ -498,7 +494,7 @@ class Database {
                 $buffer_js = json_decode($response, true);
                 return $buffer_js;
             }catch (\Exception $e) {
-                error_log($response, 0);
+                
                 error_log($e->getMessage(), 0);
                 return $response;
             }
@@ -539,7 +535,7 @@ class Database {
         }
 
 		$buffer = Database::Execute($domain, "write", $data_send, $cache, $user);
-        error_log(json_encode($buffer), 0);
+        
         if($buffer != null){
             return $buffer['rows'];
         } else {
@@ -576,9 +572,9 @@ class Database {
             
             $response = file_get_contents($CONFIG->edb . "execute.php", false, $context);
             // Check for errors
-            error_log($response, 0);
+            
             if($response === false){
-                error_log($response, 0);
+                
                 die('Error');
             }
 
@@ -590,7 +586,7 @@ class Database {
                 return $buffer_js;
                 //}
             }catch (\Exception $e) {
-                error_log($response, 0);
+                
                 error_log($e->getMessage(), 0);
                 return $response;
             }
