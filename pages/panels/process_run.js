@@ -191,4 +191,13 @@ function main_process_run(){
     commandline_options_load("div_process_commandline");
     diversos_options_load("div_diversos");
     execucoes_load("div_execution_commandline");
+
+
+    EnviarJsonPost("/secanalysis/pages/panels/report.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
+        console.log(data);
+        relatorio.html("<a class='button' href='"+ data.url +"' target='_blank'>Gerar Report</a>");
+    });
 }
+
+
+//

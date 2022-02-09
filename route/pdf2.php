@@ -14,6 +14,13 @@ function limparBody($entrada_buffer){
 	}
 }
 
+function valor($js, $chave){
+    if( array_key_exists($chave, $js) ) {
+        return $js[$chave];
+    }
+    return "";
+}
+
 
 function add_note($index, $domain_id ){
     $texto = "";
@@ -239,7 +246,7 @@ if(count($ambientes) > 0) {
                 
                 //
                 $texto .= "<b>". $hosts[$k]['ip']  . " - " . $hosts[$k]['name'];   
-                if($js["addresses"]["mac"])    {         
+                if( array_key_exists("mac", $js["addresses"]))    {         
                     $texto .= "  -  (" . $js["addresses"]["mac"] . ")" ;
                 }
                 $texto .=  "</b></br>";
@@ -249,16 +256,25 @@ if(count($ambientes) > 0) {
                 $ports = Database::List_data("/local/hacker", "lan_host_port", ["lan_host_id"], [ $hosts[$k]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
                 
                 $texto .= "<ul>";
+                
                 for($l = 0; $l < count($ports); $l++){
                     //$nmap_port = json_decode( $ports[$l]["nmap"], true);
-                    $nmap_port = explode(",", $ports[$l]["nmap"]);
+                    
+                    if($ports[$l] == null){
+                        continue;
+                    }
+
                     $texto .= "<li><b>". $ports[$l]["port"] . " - " . $ports[$l]["service"] . "</b><br/> <span> Dados: ";
-                    for($m = 0; $m < count($nmap_port); $m++){
-                        $nmap_port_field = explode(":", $nmap_port[$m]);
-                        if( trim($nmap_port_field[1]) != ""){
-                            $texto .= "<b>" . $nmap_port_field[0] . "</b>: " . $nmap_port_field[1]  . ", ";
+                    if( array_key_exists("nmap", $ports[$l])) {
+                    
+                        $nmap_port = explode(",", $ports[$l]["nmap"]);
+                        for($m = 0; $m < count($nmap_port); $m++){
+                            $nmap_port_field = explode(":", $nmap_port[$m]);
+                            if( trim($nmap_port_field[1]) != ""){
+                                $texto .= "<b>" . $nmap_port_field[0] . "</b>: " . $nmap_port_field[1]  . ", ";
+                            }
+                            //for($n = 0; $n < count($nmap_port))
                         }
-                        //for($n = 0; $n < count($nmap_port))
                     }
                     $texto .= "</span></li>";
                 }
@@ -278,8 +294,87 @@ $texto .= "<h1>". strval($index) .". DOMÍNIOS</h1>";
 if(count($domains) > 0) {
     //domain	_id, domain, project_id, about, shodan, script_version, whois, consideracoes, _user, report, ,
     for($i = 0; $i < count($domains); $i++){
-        $texto .= "<h2>". strval($index) . ".". strval($subindex) .". Domínio: " . $domains[$i]['domain'] . "</h2>";
+        $texto .= "<h2>". strval($index) . ".". strval($subindex) .". Domínio: <font color='red'>" . $domains[$i]['domain'] . "</font></h2>";
+        $texto .= $domains[$i]['about'] . "<br/>" . $domains[$i]['consideracoes'];
+        $texto .= "<h3>". strval($index) . ".". strval($subindex) .".1. IPs e Portas</h3></br>";
 
+        $ips = Database::List_data("/local/hacker", "ip", ["domain_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+        for($j = 0; $j < count($ips); $j++){
+            //_id, ip, geo, domain_id, shodan, script_version, _user, report, ,
+            $texto .= "- <b>" . $ips[$j]['ip'] . " - " . $ips[$j]['geo'] . "</b></br>";
+
+            //ip_port	_id, port, evidence, ip_id, font, date_create, protocol, _user, report, ,
+            $portas = Database::List_data("/local/hacker", "ip_port", ["ip_id"], [ $ips[$j]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+            
+            if(count($portas) > 0){
+
+                $texto .= "<ul>";
+                for($k = 0; $k < count($portas); $k++){
+                    if($portas[$k] == null){
+                        continue;
+                    }
+                    $texto .= "<li>". $portas[$k]["port"];
+                    
+                    if($portas[$k]['evidence'] != ""){
+                        $json_buffer = json_decode($portas[$k]['evidence'], true);
+                        $texto .= ": <b>Tecnologia: </b>" . $json_buffer["name"] . " ". $json_buffer["product"] . " " . $json_buffer["version"] ;
+                    }
+                    $texto .= "</li>";
+                    
+                }
+                $texto .= "</ul>";
+            }
+            
+        }
+
+        $texto .= "<h3>". strval($index) . ".". strval($subindex) .".2. Common Vulnerabilities and Exposures e Notas</h3></br>";
+        $texto .= "O Common Vulnerabilities and Exposures é um banco de dados que registra vulnerabilidades e exposições relacionadas à segurança da informação conhecidas publicamente. Abaixo temos uma lista de vulnerabilidades listadas para execução de testes de intrusão.";
+
+        // ---------------------------------------
+        //cve_occurrence	_id, cve_id, occurrence_id, evidence_id, impacto, _user, vulnerability_cicle_id, ,
+        $occurrence = Database::List_data("/local/hacker", "cve_occurrence", ["occurrence_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+        //$texto .= "</br>OCORRENCIA: " . json_encode($occurrence);
+        //cve	_id, codigo, description, full_description, script_version, score, confidentitality, integrity, availability, access_complexity, autentication, gained_access, vulnerability_type, cwe_id, ,
+        for($j = 0; $j < count($occurrence); $j++){
+            if($occurrence[$j] == null){
+                continue;
+            }
+            $cve = Database::Data("cve", ["_id"], [$occurrence[$j]['cve_id']], $cache=false)[0]['data'];
+            $texto .= "<h4><font color='red'>". $cve['codigo'] ."</font> - " .  $cve['description'] . "</h4><br/>";
+            $texto .= $cve['full_description'] . $cve['impacto'] . "</br>";
+
+            //evidence	_id, evidence, cve_occurrence_id, description, date_evidence, _user, ,
+            //$evidence = Database::Data("evidence", ["_id"], [$occurrence[$j]['evidence_id']], $cache=false)[0]['data'];
+            
+            $evidences = Database::List_data("/local/hacker", "evidence", ["cve_occurrence_id"], [$occurrence[$j]['_id']], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+            for($k = 0; $k < count($evidences); $k++){
+                $texto .= $evidences[$k]['description'] . "</br>";
+            }
+
+            //action	_id, action_status_id, action, entity_id, person_id, _user, ,
+            $actions = Database::List_data("/local/hacker", "action", ["entity_id"], [$occurrence[$j]['_id']], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+            for($k = 0; $k < count($actions); $k++){
+                $texto .= $actions[$k]['action'] . "</br>";
+            }
+        }
+
+        //--------------------------------------------------
+        //note	_id, note_type_id, entity_id, titulo, note, date_note, hidden_key, impacto, _user, vulnerability_cicle_id, report, ,
+        $notes = Database::List_data("/local/hacker", "note", ["entity_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+        for($j = 0; $j < count($notes); $j++){
+            if($notes[$j] == null) {continue; }
+            $texto .= "<h4><font color='red'>Nota: ". $notes[$j]['titulo'] ."</font></h4><br/>";
+            $texto .= $notes[$j]['note'] . "</br>";
+            $texto .= $notes[$j]['impacto'] . "</br>";
+
+            //action	_id, action_status_id, action, entity_id, person_id, _user, ,
+            $actions = Database::List_data("/local/hacker", "action", ["entity_id"], [$notes[$j]['_id']], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
+            for($k = 0; $k < count($actions); $k++){
+                $texto .= $actions[$k]['action'] . "</br>";
+            }
+        }
+
+        $subindex = $subindex + 1;
     }
 
 }
