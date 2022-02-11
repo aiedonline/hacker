@@ -39,5 +39,18 @@
     sudo python3 -m pip install dnspython
 
 
+# Máquina pronta
+    Outra opção é testar com nossa máquina pronta, uma VM Debian 10 disponível no Link: https://drive.google.com/file/d/1sNSCEr8aEzXXNoIBt6OECv4SP772z2fk/view?usp=sharing
+    Usuário do Debian: usuario
+    Senha: 123456
+
+    Usuário do Debian: root
+    Senha: 123456
+
+    http://IP_DA_VM/secanalysis/
+    Usuário do Site: root@system
+    Password: 1234
+
+
 
 
