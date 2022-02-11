@@ -110,7 +110,11 @@ function file_get_contents_res($url){
 	$context = stream_context_create(array(
 		'socket' => ['bindto' => '0:0']
 	));
-	$response = file_get_contents($url, false, $context);
+
+	if(strpos($url, "http") === false){
+		$url = dirname( __dir__, 2 ) . $url;
+	}
+	$response = file_get_contents(  $url, false, $context);
 	if($response === false){
 		
 		die('Error');

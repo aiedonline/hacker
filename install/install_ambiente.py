@@ -12,14 +12,14 @@ import subprocess, os, sys;
 #sudo apt-get install php-mysql
 
 
-
-#subprocess.run("apt install mariadb-server -y", Shell=True);
+subprocess.run("apt update -y", shell=True);
 subprocess.run("apt install apache2 -y", shell=True);
-subprocess.run("apt install php7.3 -y", shell=True);
-subprocess.run("apt install php7.3-mysql -y", shell=True);
+subprocess.run("apt install php -y", shell=True);
+subprocess.run("apt install php-mysql -y", shell=True);
 subprocess.run("apt install python3-pip -y", shell=True);
 subprocess.run("apt-get install php-mysql -y", shell=True);
 subprocess.run("systemctl restart apache2", shell=True);
+
 
 #GRANT ALL PRIVILEGES on *.* to 'root'@'localhost' IDENTIFIED BY '123456';
 #FLUSH PRIVILEGES;

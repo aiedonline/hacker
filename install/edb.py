@@ -28,7 +28,7 @@ class Database:
 
 			url = edb['url'] + edb['file'];
 			buffer_connection = requests.post(url, json=envelope);
-			print(buffer_connection.text);
+			
 			buffer = buffer_connection.json();
 			if buffer.get('version') and buffer['version'] == 2:
 				if buffer['status']:

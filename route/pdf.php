@@ -5,9 +5,6 @@ set_time_limit(0);
 //require_once dirname(__DIR__) . '/api/tcpdf/tcpdf_include.php';
 require_once dirname(__DIR__) . '/api/tcpdf/tcpdf.php';
 
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 $author = "cyberframework.online";
 $title = "Penetration Test Report";

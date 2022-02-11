@@ -1,4 +1,6 @@
 <?php
+
+
 require_once dirname(__DIR__) . "/api/json.php";
 require_once dirname(__DIR__) . "/api/edb.php";
 require_once dirname(__FILE__) . "/test_ip.php";
@@ -9,6 +11,7 @@ $part = explode("/", $_SERVER["REQUEST_URI"]);
 $post_data = json_decode(file_get_contents('php://input'), true);
 
 $project =      Database::Data("project", ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
+
 if($project['token'] != $post_data["token"]){
     die;
 }

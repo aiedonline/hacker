@@ -77,6 +77,7 @@ function add_cve($indice, $occurrence_id){
 
     }
     for($i = 0; $i < count($dados); $i++){
+        if($dados[$i] == null) {continue;}
         if( isset($dados[$i]['cve_id']) ) {
             $cve = Database::Data("cve", ["_id"], [$dados[$i]['cve_id']], $cache=false)[0]['data'];
             $texto .= "<b> " . $cve['codigo'] . " - " . $cve['description'] . "</b>";
@@ -104,6 +105,7 @@ function add_domain_ip_port($ip_id){
     $texto = "";
     $dados = Database::List_data("/local/hacker", "ip_port", ["ip_id"], [$ip_id], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
     for($i = 0; $i < count($dados); $i++){
+        if($dados[$i] == null) {continue;}
         if( isset($dados[$i]['port']) ) {
             $texto .= $dados[$i]['port'] . " - " . $dados[$i]['protocol'] ;
         }
@@ -141,14 +143,12 @@ function add_domains($project_id){
     return $texto;
 }
 
-
-
-$project_id = 'cc40fff9-b1e6-e9b2-e108-4c01178a573f';//$_GET["id"]
 $project_id = $_GET["id"];
 
 // dados do projeto
 $project = Database::Data("project", ["_id"], [$project_id], $cache=false)[0]['data'];
 if($project['token'] != $_GET["token"]){
+    echo "Projeto não pode ser acessado.";
     die;
 }
 $domains =   Database::List_data("/local/hacker", "domain", ["project_id"], [$project_id], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
@@ -179,11 +179,13 @@ if(count($domains) > 0) {
     $subindex = $subindex + 1;
 }
 
-if(count($ambientes) > 0) {
+if($ambientes != null && count($ambientes) > 0) {
     $texto .= "<h2>3.". strval($subindex) .". Análise dos seguintes ambientes (LAN):</h2><ul>";
     for($i = 0; $i < count($ambientes); $i++){
+        if(! isset($ambientes[$i]) || $ambientes[$i] == null) {continue;}
         $lans_ambiente = Database::List_data("/local/hacker", "lan", ["ambiente_id"], [$ambientes[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
         for($j = 0;$j < count($lans_ambiente ); $j++){
+            if(! isset($lans_ambiente[$j]) || $lans_ambiente[$j] == null) {continue;}
             $texto .= "<li><b>" . $ambientes[$i]['name'] . "</b> - ". $lans_ambiente[$j]['address'] ."/". $lans_ambiente[$j]['mask'] ."</li>";
         }
     }
@@ -203,16 +205,16 @@ $project_shodan = Database::Data("project_shodan_arguments", ["_id"], [$project_
 $project_whois = Database::Data("project_whois_arguments", ["_id"], [$project_id], $cache=false)[0]['data'];
 
 $texto .= "Seguintes tecnologias serão executadas neste escopo:<ul>";
-if($project_nmap['enable'] == "1"){
+if( isset($project_nmap['enable']) && $project_nmap['enable'] == "1"){
     $texto .= "<li> Execução do comando nmap contra endereço de rede local definido como \"ambiente\", com o seguinte argumento: " . $project_nmap['arguments'] . ";</li>";
 }
-if($project_nmap_domain['enable'] == "1"){
+if( isset($project_nmap_domain['enable']) && $project_nmap_domain['enable'] == "1"){
     $texto .= "<li> Execução do comando nmap contra IPs localizados nos \"domínios\", com o seguinte argumento: " . $project_nmap_domain['arguments'] . ";</li>";
 }
-if($project_shodan['enable'] == "1"){
+if(isset($project_shodan['enable']) && $project_shodan['enable'] == "1"){
     $texto .= "<li> Consulta shodan.io sobre IPs localizados nos \"domínios\";</li>";
 }
-if($project_whois['enable'] == "1"){
+if(isset($project_whois['enable']) && $project_whois['enable'] == "1"){
     $texto .= "<li> Consulta WHOIs dos \"domínios\";</li>";
 }
 $texto .= "</ul>";
@@ -228,9 +230,11 @@ $subindex = 1;
 $texto .= "<h1>". strval($index) .". AMBIENTES</h1>";
 if(count($ambientes) > 0) {
     for($i = 0; $i < count($ambientes); $i++){
+        if(! isset($ambientes[$i]) || $ambientes[$i] == null) {continue; }
         $lans_ambiente = Database::List_data("/local/hacker", "lan", ["ambiente_id"], [ $ambientes[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
         
         for($j = 0;$j < count($lans_ambiente ); $j++){
+            if($lans_ambiente[$j] == null) {continue; }
             $texto .= "<h2>". strval($index) . ".". strval($subindex) .". LAN: " . $lans_ambiente[$j]['address'] ."/". $lans_ambiente[$j]['mask'] ."</h2>";
             $texto .= $ambientes[$i]["scope"];
             $texto .= $lans_ambiente[$j]['descricao'] ;
@@ -241,6 +245,7 @@ if(count($ambientes) > 0) {
             $hosts = Database::List_data("/local/hacker", "lan_host", ["lan_id"], [ $lans_ambiente[$j]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
             
             for($k = 0; $k < count($hosts); $k++){
+                if(! isset($hosts[$k]) || $hosts[$k] == null) {continue; }
                 //_id, ip, os, _user, lan_id, name, nmap, ,
                 $js = json_decode($hosts[$k]['nmap'], true);
                 
@@ -260,7 +265,7 @@ if(count($ambientes) > 0) {
                 for($l = 0; $l < count($ports); $l++){
                     //$nmap_port = json_decode( $ports[$l]["nmap"], true);
                     
-                    if($ports[$l] == null){
+                    if(! isset($ports[$l]) || $ports[$l] == null){
                         continue;
                     }
 
@@ -294,12 +299,14 @@ $texto .= "<h1>". strval($index) .". DOMÍNIOS</h1>";
 if(count($domains) > 0) {
     //domain	_id, domain, project_id, about, shodan, script_version, whois, consideracoes, _user, report, ,
     for($i = 0; $i < count($domains); $i++){
+        if(! isset($domains[$i]) || $domains[$i] == null) {continue; }
         $texto .= "<h2>". strval($index) . ".". strval($subindex) .". Domínio: <font color='red'>" . $domains[$i]['domain'] . "</font></h2>";
         $texto .= $domains[$i]['about'] . "<br/>" . $domains[$i]['consideracoes'];
         $texto .= "<h3>". strval($index) . ".". strval($subindex) .".1. IPs e Portas</h3></br>";
 
         $ips = Database::List_data("/local/hacker", "ip", ["domain_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
         for($j = 0; $j < count($ips); $j++){
+            if(! isset($ips[$j]) || $ips[$j] == null) {continue; }
             //_id, ip, geo, domain_id, shodan, script_version, _user, report, ,
             $texto .= "- <b>" . $ips[$j]['ip'] . " - " . $ips[$j]['geo'] . "</b></br>";
 
@@ -310,7 +317,8 @@ if(count($domains) > 0) {
 
                 $texto .= "<ul>";
                 for($k = 0; $k < count($portas); $k++){
-                    if($portas[$k] == null){
+
+                    if(! isset($portas[$k]) || $portas[$k] == null){
                         continue;
                     }
                     $texto .= "<li>". $portas[$k]["port"];
@@ -336,7 +344,7 @@ if(count($domains) > 0) {
         //$texto .= "</br>OCORRENCIA: " . json_encode($occurrence);
         //cve	_id, codigo, description, full_description, script_version, score, confidentitality, integrity, availability, access_complexity, autentication, gained_access, vulnerability_type, cwe_id, ,
         for($j = 0; $j < count($occurrence); $j++){
-            if($occurrence[$j] == null){
+            if(! isset($occurrence[$j]) || $occurrence[$j] == null){
                 continue;
             }
             $cve = Database::Data("cve", ["_id"], [$occurrence[$j]['cve_id']], $cache=false)[0]['data'];
@@ -348,12 +356,14 @@ if(count($domains) > 0) {
             
             $evidences = Database::List_data("/local/hacker", "evidence", ["cve_occurrence_id"], [$occurrence[$j]['_id']], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
             for($k = 0; $k < count($evidences); $k++){
+                if(! isset($evidences[$k]) || $evidences[$k] == null) {continue; }
                 $texto .= $evidences[$k]['description'] . "</br>";
             }
 
             //action	_id, action_status_id, action, entity_id, person_id, _user, ,
             $actions = Database::List_data("/local/hacker", "action", ["entity_id"], [$occurrence[$j]['_id']], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
             for($k = 0; $k < count($actions); $k++){
+                if(! isset($actions[$k]) ||  $actions[$k] == null) {continue; }
                 $texto .= $actions[$k]['action'] . "</br>";
             }
         }
@@ -362,7 +372,7 @@ if(count($domains) > 0) {
         //note	_id, note_type_id, entity_id, titulo, note, date_note, hidden_key, impacto, _user, vulnerability_cicle_id, report, ,
         $notes = Database::List_data("/local/hacker", "note", ["entity_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
         for($j = 0; $j < count($notes); $j++){
-            if($notes[$j] == null) {continue; }
+            if( ! isset($notes[$j]) || $notes[$j] == null) {continue; }
             $texto .= "<h4><font color='red'>Nota: ". $notes[$j]['titulo'] ."</font></h4><br/>";
             $texto .= $notes[$j]['note'] . "</br>";
             $texto .= $notes[$j]['impacto'] . "</br>";

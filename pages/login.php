@@ -105,11 +105,11 @@
 
   <!-- Custom scripts for all pages-->
   <?php echo '<script src="../js/sb-admin-2.js?id=' . guid() . '"></script>';  ?>
-  <script src='http://localhost/jscloud/project/layout/EnviarJsonPost.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
-  <script src='http://localhost/jscloud/project/cookie/readCookie.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
-  <script src='http://localhost/jscloud/project/cookie/createCookie.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
-  <script src='http://localhost/jscloud/project/util/ToJson.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
-	<script src='http://localhost/jscloud/project/util/md5.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
+  <script src='/jscloud/project/layout/EnviarJsonPost.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
+  <script src='/jscloud/project/cookie/readCookie.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
+  <script src='/jscloud/project/cookie/createCookie.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
+  <script src='/jscloud/project/util/ToJson.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
+	<script src='/jscloud/project/util/md5.cp/v1.js?id=0a4b0ee1c049f8083de31a5f9302287c' ></script>
 
   <?php echo '<script src="./login.js?id=' . guid() . '"></script>';  ?>
 

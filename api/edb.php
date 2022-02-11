@@ -1,10 +1,7 @@
 <?php
 
 // EDB em API
-//api/edb.php
-//ini_set('display_errors', '1');
-//ini_set('display_startup_errors', '1');
-//error_reporting(E_ALL);
+
 
 require_once __DIR__  . '/json.php';
 
@@ -97,8 +94,8 @@ class Database {
                 die('Error');
             }
 			
-			$buffer_js = json_decode($response, true);
-			return $buffer_js;
+			//$buffer_js = json_decode($response, true);
+			return Database::outputToJson($response);
         }catch (Exception $e) {
 			error_log($e->getTraceAsString(), 0);
             throw $e;
@@ -214,6 +211,25 @@ class Database {
 		return Database::Execute($domain, "field_add", array( "domain" => $domain, "entity" => $entity,  "name" => $name, "type" => $type ), false, null);
     }
 	
+	public static function outputToJson($output){
+		$pos = strrpos($output, "\n");
+		if ($pos === false) { // note: três sinais iguais
+			return json_decode($output, true);
+		}
+
+		$linhas = $pieces = explode("\n", $output);
+		for($i = 0; $i < count($linhas); $i++){
+			try{
+				$buffer_js = json_decode($linhas[$i], true);
+				error_log("Foi convertido em json com sucesso..");
+				return $buffer_js;
+			}catch (Exception $e) {
+				echo 'Exceção capturada: ',  $e->getMessage(), "\n";
+			}
+		}
+		return null;
+	}
+
 	public static function Execute($domain, $action, $data, $cache, $user ){
         try{
 			
@@ -245,8 +261,8 @@ class Database {
                 die('Error');
             }
 			
-			$buffer_js = json_decode($response, true);
-			return $buffer_js;
+			//$buffer_js = json_decode($response, true);
+			return Database::outputToJson($response);
         }catch (Exception $e) {
 			error_log($e->getTraceAsString(), 0);
             throw $e;

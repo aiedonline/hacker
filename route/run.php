@@ -1,5 +1,4 @@
 <?php
-    error_reporting(E_ALL);
     // You may use status(), start(), and stop(). notice that start() method gets called automatically one time.
     $process = new Process("/usr/bin/python3 /var/well/secanalysis/bot/app.py -s '127.0.0.1' -p 'cc40fff9-b1e6-e9b2-e108-4c01178a573f' -t 'd5c8cb88-2980-4fe2-a6a6-74d931546d48' -u 'c308f6804bdd1a856355d3a34113f22a5d5f799b'");
 

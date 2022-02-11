@@ -11,7 +11,6 @@ sys.path.insert(0, os.environ["ROOT"]);
 from api.hacker import *;
 data = sys.stdin.readlines();
 data = json.loads(data[0]);
-#data = {"_id" : "aaaa", "project_id" : "aaa", "token" : "aaaa", "user" : "aaa",  "shodan_key" : "", "host" : "127.0.0.1"};
 
 from shodan import Shodan
 

@@ -64,6 +64,20 @@
   <!-- link href="/<php  print($CONFIG->ui->sigla);  >/css/sb-admin-2.css" rel="stylesheet" -->
   	<?php importar_css("css/sb-admin-2");  ?>
 	<?php importar_css("pages/template");  ?>
+  <script src="/secanalysis/js/ckeditor_classic/ckeditor.js"></script>
+
+  <style>
+.ck-editor__editable_inline {
+    min-height: 700px;
+}
+</style>
+
+  <script type="text/javascript">
+                // do this before the first CKEDITOR.replace( ... )
+                //CKEDITOR.timestamp = 'something_random';
+                
+        </script>
+
 </head>
 
 <body id="page-top">	
@@ -145,11 +159,16 @@
   <script src="/<?php  print($CONFIG->ui->sigla);  ?>/js/esb.js"></script>
 	  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+  <link href= "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
 	
   <?php
-    echo '<script src="//cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>';
+    //echo '<script src="//cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>';
+
+
+    //echo '<script src="https://haecetec.cps.sp.gov.br/phpys/public/ckeditor/ckeditor.js?v=1"></script>';
+    //echo '<script src="https://haecetec.cps.sp.gov.br/phpys/public/ckeditor/config.js?v=1"></script>';
+
   ?>
   <script src="/secanalysis/js/jsonedit/json-edit.js"></script>
   <link href="/secanalysis/js/jsonedit/json-edit.css" rel="stylesheet" type="text/css" />
