@@ -5,6 +5,7 @@
 	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=action_status&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Status Acṍes"},
 	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=person&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Pessoas"},
 	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=vulnerability_cicle&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Ciclo Vulnerabilidade"},
-	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=token_user&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Token Acesso"}
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=token_user&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "Token Acesso"},
+	{"type" : "item","link" : "/secanalysis/pages/virtual.php?entity=access_ip&layout=listar", "fa" : "fa-fw fa-list-alt", "text" : "IPs permitidos"}
 
 ]

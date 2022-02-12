@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . "/api/json.php";
+require_once dirname(__DIR__) . "/api/edb.php";
 
 $ip = null;
 if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -9,9 +11,21 @@ if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
     $ip = $_SERVER['REMOTE_ADDR'];
 }
 
-if ($ip != "127.0.0.1"){
-    die;
+function validar_ip($ip){
+    if ($ip != "127.0.0.1"){
+        $ips = Database::Data("access_ip", [], [], $cache=false)[0]['data'];
+        for($i = 0; $i < count($ips); $i++){
+            if($ips[$i]["ip"] == $ip){
+                return;
+            }
+        }
+        error_log("IP que não pode acessar: " . $ip, 0);
+        die;
+    }
 }
+
+validar_ip($ip);
+
 
 
 ?>

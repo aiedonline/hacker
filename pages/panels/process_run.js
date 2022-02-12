@@ -97,8 +97,16 @@ function nmap_options_load(div){
     });
 }
 
+function btn_download_bot_click(){
+    window.location.href = "/secanalysis/download/bot.tar.gz";
+}
+
 function commandline_options_load(div){
     AddTextArea("div_process_commandline", "txt_commandline", 10);
+    
+    AddRow(div, [8, 4], undefined, "div_process_commandline_line");
+    AddButton("div_process_commandline_line_1", "Download BOT", "btn_download_bot_click", "btn_download_bot", {"type" : "warning"})
+        
     EnviarJsonPost("/secanalysis/pages/panels/process_run.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
         txt_commandline.val(data.command);
     });
@@ -195,7 +203,7 @@ function main_process_run(){
 
     EnviarJsonPost("/secanalysis/pages/panels/report.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
         console.log(data);
-        relatorio.html("<a class='button' href='"+ data.url +"' target='_blank'>Gerar Report</a>");
+        relatorio.html("<a class='button' href='"+ data.url +"' target='_blank'>Gerar o documento Penetration Test Report</a>");
     });
 }
 

@@ -73,14 +73,19 @@ rm -r /tmp/hacker/secanalysis/inistall
 mkdir /tmp/hacker/secanalysis/uploads
 echo '[+] SECANALYSIS configurado (padrão)';
 
+mkdir /tmp/hacker/secanalysis/download
+cd /tmp/hacker/secanalysis/bot
+tar -zcf /tmp/hacker/secanalysis/download/bot.tar.gz .
+echo '[+] SECANALYSIS bot gerado';
+
 cp -r "$DIR_PROJECT/secanalysis/install" /tmp/
 rm -r /tmp/install/make.sh
 cd /tmp/install
-tar -zcvf /tmp/install.tar.gz .
+tar -zcf /tmp/install.tar.gz .
 echo '[+] INSTALADOR GERADO';
 
 cd /tmp/hacker
-tar -zcvf /tmp/hacker.tar.gz .
+tar -zcf /tmp/hacker.tar.gz .
 echo '[+] PACOTES GERADOS';
 
 rm -r /tmp/hacker

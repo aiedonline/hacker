@@ -30,4 +30,16 @@ db.SendServer("/local/hacker","write",[{"entity":"vulnerability_cicle","data":{"
 db.SendServer("/local/hacker","write",[{"entity":"vulnerability_cicle","data":{"_id": hashlib.md5("Remediate".encode()).hexdigest(),  "name" : "Remediate", "description" : "Prioritize and fix vulnerabilities in order according to business risk. Establish controls and demonstrate progress.", "sequencia" : 5}}]);
 db.SendServer("/local/hacker","write",[{"entity":"vulnerability_cicle","data":{"_id": hashlib.md5("Verify".encode()).hexdigest(),  "name" : "Verify", "description" : "Verify that threats have been eliminated through follow-up audits.", "sequencia" : 6}}]);
 
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Não averiguado".encode()).hexdigest(),  "description" : "Não averiguado"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Averiguado".encode()).hexdigest(),  "description" : "Averiguado"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Notificado".encode()).hexdigest(),  "description" : "Notificado"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Em correção".encode()).hexdigest(),  "description" : "Em correção"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Correção aplicada".encode()).hexdigest(),  "description" : "Correção aplicada"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"action_status","data":{"_id": hashlib.md5("Cancelado".encode()).hexdigest(),  "description" : "Cancelado"}}]);
+
+db.SendServer("/local/hacker","write",[{"entity":"note_type","data":{"_id": hashlib.md5("Output de programa".encode()).hexdigest(),  "description" : "Output de programa", "name" : "Output de programa"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"note_type","data":{"_id": hashlib.md5("Observação direta".encode()).hexdigest(),  "description" : "Observação direta", "name" : "Observação direta"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"note_type","data":{"_id": hashlib.md5("Ambiente físico".encode()).hexdigest(),  "description" : "Ambiente físico", "name" : "Ambiente físico"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"note_type","data":{"_id": hashlib.md5("Engenharia Social".encode()).hexdigest(),  "description" : "Engenharia Social", "name" : "Engenharia Social"}}]);
+db.SendServer("/local/hacker","write",[{"entity":"note_type","data":{"_id": hashlib.md5("Diverso".encode()).hexdigest(),  "description" : "Diverso", "name" : "Diverso"}}]);
 
