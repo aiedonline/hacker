@@ -40,7 +40,8 @@
 
 
 # Máquina pronta
-    Outra opção é testar com nossa máquina pronta, uma VM Debian 10 disponível no Link: https://drive.google.com/file/d/1sNSCEr8aEzXXNoIBt6OECv4SP772z2fk/view?usp=sharing
+    Outra opção é testar com nossa máquina pronta, uma VM Debian 10 disponível no Link: 
+    https://drive.google.com/file/d/1AJRPYWQNFFFDbUMugSHjXQx6VDFJdmdg/view?usp=sharing
     Usuário do Debian: usuario
     Senha: 123456
 
