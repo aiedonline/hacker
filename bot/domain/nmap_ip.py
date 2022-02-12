@@ -31,6 +31,6 @@ def ports_ip(ip):
                 envelopes.append(envelope);
         
         for envelope in envelopes:
-            retorno = SendService(ip["server_ip"], "add_ip_port.php", envelope);
+            retorno = SendService(ip["server_ip"], "add_ip_port.php", envelope, port=data["port"], protocol=data["protocol"]);
 
 ports_ip(data);

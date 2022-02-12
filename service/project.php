@@ -14,6 +14,10 @@ $project = Database::Data("project", ["_id"], [$post_data["project_id"]], $cache
 if($project['token'] != $post_data["token"]){
     die;
 }
+
+// Atuando...
+//validar_ip($ip, $post_data["user"]);
+
 $retorno = array("project" => $project, "nmap" => array("arguments" => null, "lans" => []), 
                     "nmap_domain" => array("arguments" => null, "ips" => []), "shodan" => null, 
                     "whois" => array("arguments" => null, "domains" => []));

@@ -9,6 +9,6 @@ if os.path.exists("/tmp/hacker/"):
     subprocess.run("rm -r /tmp/hacker", shell=True);
 
 subprocess.run("mkdir /tmp/hacker", shell=True);
-subprocess.run("tar -zxvf /tmp/hacker.tar.gz -C /tmp/hacker/", shell=True);
+subprocess.run("tar -zxf /tmp/hacker.tar.gz -C /tmp/hacker/", shell=True);
 
 

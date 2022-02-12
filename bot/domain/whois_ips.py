@@ -45,7 +45,7 @@ if dados_whois.get("name_server") != None:
             for ip in ip_list:
                 print('\033[93m', "\t\t[->]", '\033[0m', " - ", ip, '\033[0m');
                 envelope = {"ip" : ip , "domain_id" : data['domain_id'], "user" : data["user"] };
-                retorno = SendService(data["server_ip"], "add_ip_domain.php", envelope);
+                retorno = SendService(data["server_ip"], "add_ip_domain.php", envelope, port=data["port"], protocol=data["protocol"]);
         except:
             # ofuscar problema, não é preciso pegar 100%
             a = "";

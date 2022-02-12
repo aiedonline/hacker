@@ -23,7 +23,7 @@ try:
     script_version = 1
 
     envelope = {"_id" : data["_id"], "host" :  data["host"] , "geo" : geo, "shodan" : json.dumps(shodan), "project_id" : data['project_id'], "token" : data["token"], "user" : data["user"] };
-    retorno = SendService(data["server_ip"], "update_ip.php", envelope);
+    retorno = SendService(data["server_ip"], "update_ip.php", envelope, port=data["port"], protocol=data["protocol"]);
     for port in shodan["ports"]:
         n = nmap.PortScanner();
         
@@ -42,7 +42,7 @@ try:
             font = "nmap";
             protocol = "udp";
         envelope = {"ip_id" : data["_id"], "port" :  port , "evidence" : evidence, "font" : font, "protocol" : protocol ,"project_id" : data['project_id'], "token" : data["token"], "user" : data["user"] };
-        retorno = SendService(data["server_ip"], "add_ip_port.php", envelope);
+        retorno = SendService(data["server_ip"], "add_ip_port.php", envelope, port=data["port"], protocol=data["protocol"]);
 except:
     # limpa a API e suprime, não adianta parar por migalha...
     api = None;

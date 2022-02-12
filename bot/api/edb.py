@@ -26,7 +26,7 @@ class Database:
 			envelope['domain'] = domain ;
 			envelope['action'] = action;
 			envelope['envelop'] = data;
-			envelope['user'] = None;
+			envelope['user'] = data['user'];
 
 			url = edb['url'] + edb['file'];
 			

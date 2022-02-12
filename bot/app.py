@@ -1,5 +1,6 @@
 #!/bin/python3
-import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime, uuid;
+import argparse, subprocess, json, time, traceback, sys, os, inspect, datetime, uuid
+
 
 # ============================ IMPORTAÇOES EM GERAL =====================================
 ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/";
@@ -20,9 +21,26 @@ def install_dependence(dependence):
         print("[*] Install: ",  dependence['install']);
         subprocess.run(["python3", "-m", "pip", "install", dependence['install']]);
 
+
+
+# ============================ ARGUMENTOS SENDO PROCESSADOS =========================
+ap = argparse.ArgumentParser();
+ap.add_argument("-s", "--server",  required=True, help="IP do server");
+ap.add_argument("-p", "--project", required=True, help="_id do projeto");
+ap.add_argument("-t", "--token",   required=True, help="Chave gerada para o projeto");
+ap.add_argument("-u", "--user",    required=True, help="Código do usuário");
+
+ap.add_argument("-pt", "--protocol",    required=True, help="Protocolo");
+ap.add_argument("-po", "--port",        required=True, help="Porta");
+args = vars(ap.parse_args())
+
+
 # Retorna um CacheExec
 def run_commands(script, dados_de_input, dependencias=[], timeout=3, key=None, time=1):
+    global args;
     global stderr, stdout;
+    dados_de_input['port'] = port=args["port"];
+    dados_de_input['protocol'] = port=args["protocol"];
     for dependencia in dependencias:
         install_dependence(dependencia);
     ex = CacheExec();
@@ -33,14 +51,6 @@ def run_commands(script, dados_de_input, dependencias=[], timeout=3, key=None, t
     stdout += script.upper() + "\n" +  ex.stdout + "\n\n";
     stderr += script.upper() + "\n" +  ex.stderr+ "\n\n";
     return ex;
-
-# ============================ ARGUMENTOS SENDO PROCESSADOS =========================
-ap = argparse.ArgumentParser();
-ap.add_argument("-s", "--server",  required=True, help="IP do server");
-ap.add_argument("-p", "--project", required=True, help="_id do projeto");
-ap.add_argument("-t", "--token",   required=True, help="Chave gerada para o projeto");
-ap.add_argument("-u", "--user",    required=True, help="Código do usuário");
-args = vars(ap.parse_args())
 
 # =============================== VARIAVEIS E VALORES ==========================
 
@@ -61,7 +71,7 @@ print("\033[96m\033[1m", "SecAnalysis", "\033[00m", "v." + VERSION, "https://www
 
 # =============================== EXECUÇÒES =======================================
 dados_json = {"project_id" : args["project"], "token" : args["token"],  "user" : args["user"]};
-projeto = SendService(args["server"], "project.php", dados_json );
+projeto = SendService(args["server"], "project.php", dados_json, port=args["port"], protocol=args["protocol"] );
 
 def nmap_switch(server_ip, user, token, nmap_json):
     # nmap_json = {'arguments': {'_id': '', 'project_id': '', 'enable': '1', 'arguments': '-sV -O'}, 'lans': []}
@@ -124,7 +134,7 @@ def dns_switch(server_ip, user, token, whois_json):
 try:
     # INSERT NA TABELA execution COM PROJECT_ID
     envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args["token"], "action" : "start" };
-    retorno = SendService(args["server"], "exec.php", envelope);
+    retorno = SendService(args["server"], "exec.php", envelope, port=args["port"], protocol=args["protocol"] );
 
     # TEMOS QUE COLOCAR ANTES DE RODAR IS SCRIPTS UMA DESCRIÇÀO DO QUE VAI SER RODADO
     #     POIS UM SCRIPT PODE DEMORAR E ACABAR DEIXANDO O USUÁRIO NA DÚVIDA.
@@ -157,11 +167,11 @@ try:
     print("\nProcedimento executado em: ", (DIFERENCA.seconds // 60), "minuto(s) e", (DIFERENCA.seconds % 60), "segundo(s)", '\033[0m');
     # UPDATE NA TABELA execution COM PROJECT_ID
     envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args['token'], "stdout" : stdout, "stderr" : stderr, "status_code" : "0",  "action" : "sucess" };
-    retorno = SendService(args["server"], "exec.php", envelope); 
+    retorno = SendService(args["server"], "exec.php", envelope, port=args["port"], protocol=args["protocol"] ); 
 except:
     traceback.print_exc();
     # UPDATE NA TABELA execution COM PROJECT_ID
     envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args['token'], "stdout" : stdout, "stderr" : stderr, "status_code" : "1",  "action" : "error" };
-    retorno = SendService(args["server"], "exec.php", envelope);
+    retorno = SendService(args["server"], "exec.php", envelope, port=args["port"], protocol=args["protocol"] );
 
 sys.exit(0);

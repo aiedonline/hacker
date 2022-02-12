@@ -34,7 +34,7 @@ if hasattr(n, 'all_hosts'):
                 os_type += n[host].get("osmatch")[i].get("name") + " ";
 
         envelope = {"lan_id" : data["lan_id"], "ip" :  host ,  "name" : n[host].hostname(), "os" : os_type, "nmap" : json.dumps(n[host]),"project_id" : data['project_id'], "token" : data["token"], "user" : data["user"] };
-        retorno = SendService(data["server_ip"], "add_host.php", envelope);
+        retorno = SendService(data["server_ip"], "add_host.php", envelope, port=data["port"], protocol=data["protocol"]);
         for protocol in  n[host].all_protocols():
             for port in n[host][protocol].keys():
                 buffer = ""; servico = "";
@@ -49,4 +49,4 @@ if hasattr(n, 'all_hosts'):
                 print('\033[93m', " [>]", '\033[0m', "- ", port, servico);
                 envelope = {"lan_host_id" : data["lan_id"] + host, "port" :  port ,  "nmap" : buffer , "service" : servico,
                                             "project_id" : data['project_id'], "token" : data["token"], "user" : data["user"] };
-                retorno = SendService(data["server_ip"], "add_host_port.php", envelope);
+                retorno = SendService(data["server_ip"], "add_host_port.php", envelope, port=data["port"], protocol=data["protocol"]);

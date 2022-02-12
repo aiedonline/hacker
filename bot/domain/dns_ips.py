@@ -36,4 +36,4 @@ def bruteforce_dns_ipv4():
 ip_list_all = bruteforce_dns_ipv4();        
 for ip in ip_list_all:
     envelope = {"ip" : ip , "domain_id" : data['domain_id'], "user" : data["user"] };
-    retorno = SendService(data["server_ip"], "add_ip_domain.php", envelope);
+    retorno = SendService(data["server_ip"], "add_ip_domain.php", envelope, port=data["port"], protocol=data["protocol"]);

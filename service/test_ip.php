@@ -11,9 +11,9 @@ if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
     $ip = $_SERVER['REMOTE_ADDR'];
 }
 
-function validar_ip($ip){
+function validar_ip($ip, $user){
     if ($ip != "127.0.0.1"){
-        $ips = Database::Data("access_ip", [], [], $cache=false)[0]['data'];
+        $ips = Database::List_data("/local/hacker", "access_ip", [], [], 99999, [ array("field" => "_id", "order" => "asc") ]);
         for($i = 0; $i < count($ips); $i++){
             if($ips[$i]["ip"] == $ip){
                 return;
@@ -23,9 +23,5 @@ function validar_ip($ip){
         die;
     }
 }
-
-validar_ip($ip);
-
-
 
 ?>

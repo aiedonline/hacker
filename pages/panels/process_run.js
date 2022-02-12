@@ -107,8 +107,11 @@ function commandline_options_load(div){
     AddRow(div, [8, 4], undefined, "div_process_commandline_line");
     AddButton("div_process_commandline_line_1", "Download BOT", "btn_download_bot_click", "btn_download_bot", {"type" : "warning"})
         
-    EnviarJsonPost("/secanalysis/pages/panels/process_run.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
-        txt_commandline.val(data.command);
+    //EnviarJsonPost("/secanalysis/pages/panels/process_run.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
+    //    txt_commandline.val(data.command);
+    //});
+    EdbRead("project", ["_id"], [Parameter("id")], function(projeto, erro, status){
+        txt_commandline.val( "sudo python3 ./app.py -s '"+ (window.location.host.indexOf(":") >= 0 ? window.location.host.split(":")[0] : window.location.host) +"' -p '"+ projeto['_id'] +"' -t '"+ projeto['token'] +"' -u '"+ USER._id +"' -pt "+ window.location.protocol.replace(":", "") +" -po " + ( window.location.port != "" ? window.location.port : "80")  );
     });
 }
 
@@ -206,6 +209,7 @@ function main_process_run(){
         relatorio.html("<a class='button' href='"+ data.url +"' target='_blank'>Gerar o documento Penetration Test Report</a>");
     });
 }
+
 
 
 //
