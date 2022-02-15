@@ -84,6 +84,8 @@ def nmap_switch(server_ip, user, token, nmap_json):
         envelop_nmap = {"server_ip" : server_ip, "address" : lan['address'], "mask" : lan['mask'], "arguments" : nmap_json['arguments']['arguments'], "lan_id" : lan["_id" ], "project_id" : nmap_json['arguments']["project_id" ], "user" : user, "token" : token };
         run_commands("network/nmap_scanner.py", envelop_nmap, dependencias=[{"name" : "nmap", "install" : "python-nmap"}], key=("network/nmap_scanner.py" + envelop_nmap['address']), timeout=10);
 
+
+
 def nmap_domain_switch(server_ip, user, token, nmap_json):
     if len(nmap_json['ips']) == 0:
         return;
@@ -95,6 +97,24 @@ def nmap_domain_switch(server_ip, user, token, nmap_json):
         ip["token"] = token;
         ip["project_id"] = args["project"];
         run_commands("domain/nmap_ip.py", ip, dependencias=[{"name" : "nmap", "install" : "python-nmap"}], key=("domain/nmap_ip.py" + ip['ip']));
+
+
+def ipquality_switch(server_ip, user, token, ipquality_json):
+    if ipquality_json['ipquality_key'] == None or ipquality_json['ipquality_key'] == "":
+        print("\033[94m\033[1mInforme a key ipquality\033[00m");
+        return;
+    if len(ipquality_json['hosts']) == 0:
+        return;
+    
+    print('\033[91m\033[1m', "Run Ipquality:", '\033[00m');
+    for i in range(len( ipquality_json['hosts'])):   
+        host = ipquality_json['hosts'][i];
+        if host== None or host.get("ip") == None:
+            continue;
+        # ## server_ip, port, protocol, ip, key
+        envelop = {"server_ip" : server_ip, "key" : ipquality_json['ipquality_key'], "_id" : host["_id"],  "ip" : host["ip"], "project_id" : args["project"], "user" : user, "token" : token };
+        run_commands("network/ipquality.py", envelop, dependencias=[{"name" : "requests", "install" : "requests"}], key=("network/ipquality.py_" + host["_id"]));
+
 
 def shodan_switch(server_ip, user, token, shodan_json):
     if shodan_json['shodan_key'] == None or shodan_json['shodan_key'] == "":
@@ -147,6 +167,8 @@ try:
         print("\t-> Run nmap in Domain");
     if projeto.get('shodan') != None and projeto['shodan'].get("enable") == "1":
         print("\t-> Run Shodan.io");
+    if projeto.get('ipquality') != None and projeto['ipquality'].get("enable")  == "1":
+        print("\t-> Run IPQuality");
 
     buffer_exec = whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
     buffer_exec = dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
@@ -157,7 +179,8 @@ try:
         buffer_exec = nmap_switch(args["server"], args["user"], args["token"], projeto['nmap'  ]);
     if projeto.get('shodan') != None and projeto['shodan'].get("enable")  == "1":
         buffer_exec = shodan_switch(args["server"], args["user"], args["token"], projeto['shodan']);
-
+    if projeto.get('ipquality') != None and projeto['ipquality'].get("enable")  == "1":
+        buffer_exec = ipquality_switch(args["server"], args["user"], args["token"], projeto['ipquality']);
     # ============================ RELATÓRIO FINAL =============================
 
     DATA_FINALIZACAO = datetime.datetime.now();

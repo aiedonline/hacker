@@ -1,5 +1,36 @@
 
 
+// ----------=========== IPQUALITY ================-----------------
+function ipquality_options_load(div){
+
+    EdbRead("project_ipquality_arguments", ["project_id"], [Parameter("id")], function(saida, erro, status){
+        AddRadioGroup(div, "rd_ipquality_enable", [{"value" : 0, "field" : "Não executar" }, {"value" : 1 , "field" : "Executar"}], "field", "value" , false);
+        AddText(div, "text", "Key", "Key obtida no site do ipquality", "txt_ipquality_key");
+        AddRow(div, [8, 4], undefined, "div_ipquality_button");
+        AddButton("div_ipquality_button_1", "Salvar parametros ipquality.io", "btn_ipquality_salvar_click", "btn_ipquality_salvar", {"type" : "warning"})
+        
+        if(saida == undefined){
+            EdbWrite(["project_ipquality_arguments"], [["_id", "project_id", "enable", "ipquality_key"]], [[Parameter("id"), Parameter("id"), 0, ""]], function(saida, status, erro){
+                rd_ipquality_enable.val(0);
+                txt_ipquality_key.val("");
+            });
+        } else{
+            rd_ipquality_enable.val(saida['enable']);
+            txt_ipquality_key.val(saida['ipquality_key']);
+            
+        }
+    });
+}
+
+function btn_ipquality_salvar_click(){
+    EdbWrite(["project_ipquality_arguments"], [["_id", "project_id", "enable", "ipquality_key"]], 
+                [[Parameter("id"), Parameter("id"), rd_ipquality_enable.val()[0], txt_ipquality_key.val()]], function(saida, status, erro){
+        console.log(saida, status, erro);
+        alert("sucesso");
+    });
+
+}
+
 // ----------=========== SHODAN ================-----------------
 function shodan_options_load(div){
 
@@ -41,6 +72,8 @@ function update_execution_log(){
         if(data == undefined){
             return;
         }
+
+        data.sort(function(a, b){ if( a.date_execution > b.date_execution ) {return -1; } else {return 1;} });
         AddRowTable("div_execution_commandline", [{"field" : "date_execution", "text" : "Data Execução"}, {"field" : "ip", "text" : "IP do cliente"}, {"field" : "status", "text" : "Status"},  {"field" : "status_code", "text" : "Código de saída"}],
              data, "tbl_executions", function (row, key, value, data, j , i){
                  if(value == null) return "";
@@ -192,7 +225,7 @@ function btn_other_salvar_click(){
 function main_process_run(){
     var div = $("#Process");
     AddTab(div, [{"text" : "Nmap (Ambiente Local)", "div" : "div_process_nmap"}, {"text" : "Nmap (Domínios)", "div" : "div_process_nmap_domain"},
-                    {"text" : "Shodan", "div" : "div_process_shodan"}, {"text" : "Diversos", "div" : "div_diversos"},
+                    {"text" : "Shodan", "div" : "div_process_shodan"}, {"text" : "Ipquality", "div" : "div_process_ipquality"}, {"text" : "Diversos", "div" : "div_diversos"},
                     {"text" : "Command line", "div" : "div_process_commandline"}, {"text" : "Execuções", "div" : "div_execution_commandline"}],
      "tab_process_run")
 
@@ -202,7 +235,7 @@ function main_process_run(){
     commandline_options_load("div_process_commandline");
     diversos_options_load("div_diversos");
     execucoes_load("div_execution_commandline");
-
+    ipquality_options_load("div_process_ipquality");
 
     EnviarJsonPost("/secanalysis/pages/panels/report.php", {"id" : Parameter("id"), "user" : USER._id}, function(data, erro, entrada, parametros) {
         console.log(data);

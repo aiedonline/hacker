@@ -25,6 +25,7 @@ $retorno = array("project" => $project, "nmap" => array("arguments" => null, "la
 $project_nmap   = Database::Data("project_nmap_arguments",   ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
 $project_nmap_domain   = Database::Data("project_nmap_domain_arguments",   ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
 $project_shodan = Database::Data("project_shodan_arguments", ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
+$project_ipqality = Database::Data("project_ipquality_arguments", ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
 $project_whois = Database::Data("project_whois_arguments", ["_id"], [$post_data["project_id"]], $cache=false)[0]['data'];
 
 $retorno["nmap_domain"]['arguments'] = $project_nmap_domain;
@@ -33,6 +34,9 @@ $retorno["whois"]['arguments'] = $project_whois;
 
 $retorno["shodan"] = $project_shodan;
 $retorno["shodan"]["hosts"] = [];
+
+$retorno["ipquality"] = $project_ipqality;
+$retorno["ipquality"]["hosts"] = [];
 
 $domains = Database::List_data("/local/hacker", "domain", ["project_id"], [$post_data["project_id"]], 99999, [ array("field" => "_id", "order" => "asc") ]);
 if($domains[0]['font'] != null) {
@@ -46,7 +50,7 @@ if($domains[0]['font'] != null) {
             for($j = 0; $j < count($ips); $j++){
                 array_push($retorno["shodan"]["hosts"], $ips[$j]);
                 array_push($retorno["nmap_domain"]['ips'], array("_id" => $ips[$j]["_id"],  "ip" => $ips[$j]["ip"]));
-            
+                array_push($retorno["ipquality"]["hosts"], $ips[$j]);
             }
             //$retorno["shodan"]["hosts"] = array_merge($retorno["shodan"]["hosts"], $ips);
         }
