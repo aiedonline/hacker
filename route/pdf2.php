@@ -312,23 +312,43 @@ if(count($domains) > 0) {
 
             //ip_port	_id, port, evidence, ip_id, font, date_create, protocol, _user, report, ,
             $portas = Database::List_data("/local/hacker", "ip_port", ["ip_id"], [ $ips[$j]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
-            
             if(count($portas) > 0){
 
-                $texto .= "<ul>";
+                $buffer_js =  json_decode ("{}", true);
                 for($k = 0; $k < count($portas); $k++){
 
                     if(! isset($portas[$k]) || $portas[$k] == null){
                         continue;
                     }
-                    $texto .= "<li>". $portas[$k]["port"];
-                    
+                    $service_name = "Undefined";
                     if($portas[$k]['evidence'] != ""){
                         $json_buffer = json_decode($portas[$k]['evidence'], true);
-                        $texto .= ": <b>Tecnologia: </b>" . $json_buffer["name"] . " ". $json_buffer["product"] . " " . $json_buffer["version"] ;
+                        $service_name = $json_buffer["name"] . " ". $json_buffer["product"] . " " . $json_buffer["version"];
                     }
+
+                    if( ! isset($buffer_js[$service_name] ) ){
+                        $buffer_js[$service_name] = [];
+                    }
+                    array_push($buffer_js[$service_name], $portas[$k]["port"]);
+                    //$texto .= "<li>". $portas[$k]["port"];
+                    //if($portas[$k]['evidence'] != ""){
+                    //    $json_buffer = json_decode($portas[$k]['evidence'], true);
+                    //    $texto .= ": <b>Tecnologia: </b>" . $json_buffer["name"] . " ". $json_buffer["product"] . " " . $json_buffer["version"] ;
+                    //}
+                    //$texto .= "</li>";
+                }
+                $texto .= "<ul>";
+                foreach($buffer_js as $key => $value) 
+                {
+                    $texto .= "<li><b>" . $key . "</b>: ";
+                    for($l = 0; $l < count($value); $l++){
+                        $texto .= $value[$l];
+                        if( $l < count($value) - 1 ){
+                            $texto .= ", ";
+                        }
+                    }
+
                     $texto .= "</li>";
-                    
                 }
                 $texto .= "</ul>";
             }
