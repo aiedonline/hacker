@@ -15,3 +15,4 @@ bot/tmp
 *tmp*
 bot/api/__pycache__/
 uploads/
+bot/api/__pycache__
