@@ -260,15 +260,13 @@ if(count($ambientes) > 0) {
 
                 $ports = Database::List_data("/local/hacker", "lan_host_port", ["lan_host_id"], [ $hosts[$k]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
                 
-                $texto .= "<ul>";
                 
+                $texto .= "<ul>";
                 for($l = 0; $l < count($ports); $l++){
-                    //$nmap_port = json_decode( $ports[$l]["nmap"], true);
-                    
+                    //$nmap_port = json_decode( $ports[$l]["nmap"], true);    
                     if(! isset($ports[$l]) || $ports[$l] == null){
                         continue;
                     }
-
                     $texto .= "<li><b>". $ports[$l]["port"] . " - " . $ports[$l]["service"] . "</b><br/> <span> Dados: ";
                     if( array_key_exists("nmap", $ports[$l])) {
                     
@@ -283,6 +281,7 @@ if(count($ambientes) > 0) {
                     }
                     $texto .= "</span></li>";
                 }
+                
                 $texto .= "</ul>";
 
             }
@@ -300,6 +299,8 @@ if(count($domains) > 0) {
     //domain	_id, domain, project_id, about, shodan, script_version, whois, consideracoes, _user, report, ,
     for($i = 0; $i < count($domains); $i++){
         if(! isset($domains[$i]) || $domains[$i] == null) {continue; }
+        if($domains[$i]['report'] != 1) { continue ; }
+
         $texto .= "<h2>". strval($index) . ".". strval($subindex) .". Domínio: <font color='red'>" . $domains[$i]['domain'] . "</font></h2>";
         $texto .= $domains[$i]['about'] . "<br/>" . $domains[$i]['consideracoes'];
         $texto .= "<h3>". strval($index) . ".". strval($subindex) .".1. IPs e Portas</h3></br>";
@@ -307,6 +308,7 @@ if(count($domains) > 0) {
         $ips = Database::List_data("/local/hacker", "ip", ["domain_id"], [ $domains[$i]['_id'] ], $limit=99999, $order=[ array("field" => "_id", "order" => "asc") ], $where=[])[0]['data'];
         for($j = 0; $j < count($ips); $j++){
             if(! isset($ips[$j]) || $ips[$j] == null) {continue; }
+            if($ips[$j]['report'] != 1) { continue ; }
             //_id, ip, geo, domain_id, shodan, script_version, _user, report, ,
             $texto .= "- <b>" . $ips[$j]['ip'] . " - " . $ips[$j]['geo'] . "</b></br>";
 

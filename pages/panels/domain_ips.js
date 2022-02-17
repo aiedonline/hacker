@@ -7,12 +7,17 @@ function load_domain_ips(){
         }
 
         data.sort(function(a, b){ if( a.ip > b.ip ) {return 1; } else {return -1;} });
-        AddRowTable("IPs", [{"field" : "ip", "text" : "IP do host"}, {"field" : "geo", "text" : "Localização"}, {"field" : "port", "text" : "Portas"}, {"field" : "relatorio", "text" : "Relatório"}],
+        AddRowTable("IPs", [{"field" : "report", "text" : "Rep."},{"field" : "ip", "text" : "IP do host"}, {"field" : "geo", "text" : "Localização"}, {"field" : "port", "text" : "Portas"}, {"field" : "relatorio", "text" : "Relatório"}],
              data, "tbl_ips_domains", function (row, key, value, data, j , i){
+                if(key == "report"){
+                    if(value == 1){
+                        return "Sim";
+                    }
+                    return "";
+                }
                 if(key == "relatorio"){
                     var buffer = "";
                     // , host, is_crawler, mobile, proxy, vpn, tor, active_vpn, active_tor, recent_abuse, ,
-
                     if(data.fraud_score){
                         var cor = "red";
                         if(data.fraud_score >= 85){
@@ -75,7 +80,7 @@ function load_domain_ips(){
                         //}
                     }
                     console.log(row_id, buffer_texto);
-                    $("#" + row_id + "_2").html(buffer_texto);
+                    $("#" + row_id + "_3").html(buffer_texto);
                 });
              });
         AddRow("IPs", [8, 4], undefined, "div_domain_ip_linhe");
