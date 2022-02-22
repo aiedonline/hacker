@@ -1,7 +1,5 @@
 import time, os, sys, json;
 
-#os.environ["ROOT"] = "/var/well/secanalysis/bot/";
-#data = {"ip" : "179.215.131.76", "key" :  "bpNf1YCAA9mXRBTl1N3ZqB5oePvJDOHF"}
 
 #https://ipqualityscore.com/api/json/ip/bpNf1YCAA9mXRB/179.215.131.76
 #{"success":true,"message":"Success","fraud_score":70,"country_code":"BR",
