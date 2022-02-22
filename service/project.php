@@ -49,7 +49,7 @@ if($domains[0]['font'] != null) {
             }
             for($j = 0; $j < count($ips); $j++){
                 array_push($retorno["shodan"]["hosts"], $ips[$j]);
-                array_push($retorno["nmap_domain"]['ips'], array("_id" => $ips[$j]["_id"],  "ip" => $ips[$j]["ip"]));
+                array_push($retorno["nmap_domain"]['ips'], array("_id" => $ips[$j]["_id"],  "ip" => $ips[$j]["ip"], "domain_id" => $domains[0]['data'][$i]["_id"] ));
                 array_push($retorno["ipquality"]["hosts"], $ips[$j]);
             }
             //$retorno["shodan"]["hosts"] = array_merge($retorno["shodan"]["hosts"], $ips);

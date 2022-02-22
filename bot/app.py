@@ -170,8 +170,8 @@ try:
     if projeto.get('ipquality') != None and projeto['ipquality'].get("enable")  == "1":
         print("\t-> Run IPQuality");
 
-    buffer_exec = whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
-    buffer_exec = dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
+    #buffer_exec = whois_switch(args["server"], args["user"], args["token"], projeto['whois']);
+    #buffer_exec = dns_switch(args["server"], args["user"], args["token"], projeto['whois']);
 
     if projeto.get('nmap_domain') != None and projeto['nmap_domain']["arguments"].get("enable")  == "1":
         buffer_exec = nmap_domain_switch(args["server"], args["user"], args["token"], projeto['nmap_domain'  ]);
@@ -181,6 +181,8 @@ try:
         buffer_exec = shodan_switch(args["server"], args["user"], args["token"], projeto['shodan']);
     if projeto.get('ipquality') != None and projeto['ipquality'].get("enable")  == "1":
         buffer_exec = ipquality_switch(args["server"], args["user"], args["token"], projeto['ipquality']);
+    
+
     # ============================ RELATÓRIO FINAL =============================
 
     DATA_FINALIZACAO = datetime.datetime.now();

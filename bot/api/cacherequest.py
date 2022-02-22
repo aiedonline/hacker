@@ -1,43 +1,46 @@
-import traceback
-import requests, unicodedata, hashlib, os, json, datetime;
-
-proxies = {
-    'http': 'socks5://127.0.0.1:9150',
-    'https': 'socks5://127.0.0.1:9150'
-}
+import tempfile, os, hashlib, json, datetime, unicodedata, requests, random;
+from lxml import html
 
 class CacheRequest():
-    def __init__(self, life = 60, force_onion = False, cache=True):
-        self.text = "";
-        self.life = life;
+    # life em minutos....
+    def __init__(self, life=1, cache=True):
         self.cache = cache;
-        self.force_onion = force_onion;
-
+        self.life = life;
+        self.VERSION = "2";
+        self.text = None;
+        self.tree = None;
+   
     def get(self, url):
-        name_cache = hashlib.md5(url.encode()).hexdigest() + "_v1";
-        try:
-            if os.path.exists("/tmp/requests/") == False:
-                os.makedirs("/tmp/requests/");
-        except:
-            traceback.print_exc()
-        if self.cache == True:
-            if os.path.exists("/tmp/requests/" + name_cache):
-                buffer = json.loads(open("/tmp/requests/" + name_cache).read());
-                if datetime.datetime.utcnow() < datetime.datetime.strptime(buffer['time'], '%Y-%m-%d %H:%M:%S'):
-                    self.text = buffer['html'];
+        PATH_TO_CACHE_FILE = os.path.join(tempfile.gettempdir(),  hashlib.md5( url.encode() ).hexdigest() + self.VERSION  );
+        if self.cache:
+            if os.path.exists(PATH_TO_CACHE_FILE):
+                buffer = json.loads( open(PATH_TO_CACHE_FILE, "r").read() );
+                if datetime.datetime.utcnow() < datetime.datetime.strptime(buffer["data"], '%Y-%m-%d %H:%M:%S'  ):
+                    self.text = buffer["html"];
+                    self.tree = html.fromstring(self.text);
                     return True;
-                else:
-                    os.unlink("/tmp/requests/" + name_cache);
-        page = None;
-        if url.find(".onion") > 0 or self.force_onion == True:
-            page = requests.get(url, proxies=proxies)
-        else:
-            page = requests.get(url)
-        if page.status_code != 200:
-            return False;
+        agentes = [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36" ,
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36 OPR/68.0.3618.63",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36"
+        ];
+        req = requests.Session();
+        page = req.get(url, headers = {'User-Agent': agentes[random.randint(0, 5)]});
+        #page = requests.get(url, headers = {'User-Agent': agentes[random.randint(0, 5)]});
         page.encoding = "utf-8";
-        self.text = unicodedata.normalize(u'NFKD', page.text).encode('ascii', 'ignore').decode('utf8');
-        f = open("/tmp/requests/" + name_cache , "w");
-        f.write(json.dumps({"time" : (datetime.datetime.utcnow() + datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'), "html" : self.text }));
-        f.close();
+        self.text = unicodedata.normalize(u'NFKD', page.text).encode('ascii', 'ignore').decode("utf-8");
+        self.tree = html.fromstring(self.text); 
+        if self.cache:
+            with open(PATH_TO_CACHE_FILE, 'w') as f:
+                f.write(json.dumps({"data" : (datetime.datetime.utcnow() + datetime.timedelta(minutes=self.life)).strftime('%Y-%m-%d %H:%M:%S') , "html" : self.text}));
+                f.close();
         return True;
+    def elements(self, xpath):
+        return self.tree.xpath(xpath);
+    def element(self, xpath):
+        buffer = self.elements(xpath);
+        if buffer != None and len(buffer) > 0:
+            return buffer[0];
+        return None;
