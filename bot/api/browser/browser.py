@@ -1,4 +1,4 @@
-import random, os, sys, inspect, subprocess, re, os, requests, unicodedata, time, traceback, tempfile;
+import random, os, sys, inspect, subprocess, re, os, requests, unicodedata, time, traceback, tempfile, datetime, json, hashlib;
 
 from selenium import webdriver;
 from selenium.webdriver.common.keys import Keys;
@@ -13,7 +13,7 @@ from chromedriver_helper import *;
 class Browser:
 	def __init__(self, socks5=None, terminal=True, path_directory_browser=None):
 		chromeHelper = ChromedriverHelper();
-
+		self.VERSION = "1";
 		chrome_otions = webdriver.ChromeOptions();
 		if socks5 != None:
 			chrome_otions.add_argument("--proxy-server=socks5://127.0.0.1:" + socks5);
@@ -154,13 +154,33 @@ class Browser:
 			saida.append(buffer_array);
 		return saida;
 
-	def navegar(self, url, forcar=False, lista=None, tipo='url'):
+	def navegar(self, url, forcar=False, lista=None, tipo='url', cache=None):
+		#
+		#return;
+		PATH_TO_CACHE_FILE = os.path.join(tempfile.gettempdir(),  hashlib.md5( url.encode() ).hexdigest() + self.VERSION  );
+		if cache != None:
+			if os.path.exists(PATH_TO_CACHE_FILE):
+				buffer = json.loads( open(PATH_TO_CACHE_FILE, "r").read() );
+				if datetime.datetime.utcnow() < ( datetime.datetime.strptime(buffer["data"], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(minutes=cache) ):
+					#self.driver.get("data:text/html;charset=utf-8," + buffer["html"]);
+					with open(PATH_TO_CACHE_FILE + ".html", "w") as f:
+						f.write(buffer['html']);
+						f.close();
+					self.driver.get("file://" + PATH_TO_CACHE_FILE + ".html");
+					print("\033[92mDO CACHE\033[0m");
+					return True;
 		if lista != None and url in self.historico["urls"][lista]:
 			return False; #nao navegou, nao continua
 		if forcar == False and url == self.driver.current_url:
 			return True; # já tá na URL
 		self.driver.get(url);
+		print("\033[93mDA INTERNET\033[0m");
 		self.historico["urls"].append(url);
+		if cache:
+			with open(PATH_TO_CACHE_FILE, 'w') as f:
+				f.write(json.dumps({"data" : (datetime.datetime.utcnow()).strftime('%Y-%m-%d %H:%M:%S') , "html" : self.driver.page_source}));
+				f.close();
+
 		for i in range(len(self.eventos)):
 			if tipo == "url":
 				if self.eventos[i]['valor'] == url:
@@ -207,3 +227,6 @@ class Browser:
 		self.driver.close();
 
 
+#b = Browser();
+#b.navegar("https://www.google.com", cache=1);
+#print("Elemento:", b.elemento("//body").text);
