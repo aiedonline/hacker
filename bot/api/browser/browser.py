@@ -167,14 +167,14 @@ class Browser:
 						f.write(buffer['html']);
 						f.close();
 					self.driver.get("file://" + PATH_TO_CACHE_FILE + ".html");
-					print("\033[92mDO CACHE\033[0m");
+					#print("\033[92mDO CACHE\033[0m");
 					return True;
 		if lista != None and url in self.historico["urls"][lista]:
 			return False; #nao navegou, nao continua
 		if forcar == False and url == self.driver.current_url:
 			return True; # já tá na URL
 		self.driver.get(url);
-		print("\033[93mDA INTERNET\033[0m");
+		#print("\033[93mDA INTERNET\033[0m");
 		self.historico["urls"].append(url);
 		if cache:
 			with open(PATH_TO_CACHE_FILE, 'w') as f:

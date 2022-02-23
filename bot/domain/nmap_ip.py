@@ -38,6 +38,8 @@ def ports_ip(ip):
         for envelope in envelopes:
             retorno = SendService(ip["server_ip"], "add_ip_port.php", envelope, port=data["port"], protocol=data["protocol"]);
         for tecnology in tecnologys:
+            if tecnology["name"] == "":
+                continue;
             retorno = SendService(ip["server_ip"], "add_tecnology_domain.php", tecnology, port=data["port"], protocol=data["protocol"]);
 
 ports_ip(data);

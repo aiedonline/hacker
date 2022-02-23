@@ -6,10 +6,9 @@ sys.path.insert(0, os.environ["ROOT"]);
 from api.hacker import *;
 from api.cacherequest import *;
 from api.browser.browser import *;
-#data = sys.stdin.readlines();
-#data = json.loads(data[0]);
-
-data = {"search" : "apache", "server" : "127.0.0.1", "port" : "80", "protocol" : "http", "user" :  "c308f6804bdd1a856355d3a34113f22a5d5f799b"};
+data = sys.stdin.readlines();
+data = json.loads(data[0]);
+#data = {"search" : "apache", "server" : "127.0.0.1", "port" : "80", "protocol" : "http", "user" :  "c308f6804bdd1a856355d3a34113f22a5d5f799b"};
 
 c = CacheRequest(life=180);
 bw = Browser(terminal=False, path_directory_browser="/tmp/");
@@ -29,7 +28,7 @@ if c.get("https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=" + data["search"]):
             #  'access_complexity': None, 'autentication': None,
             #  'gained_access': None, 'vulnerability_type': None, 'cwe_id': None,
             #  }
-            print(link.text_content());
+            print("\t\t", link.text_content());
             if cve_banco.get("description") == None:
                 bw.navegar("https://www.cve.org/CVERecord?id=" + link.text_content());
                 time.sleep(3);
@@ -61,12 +60,9 @@ if c.get("https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=" + data["search"]):
                     for problemtype in js_cve["problemtype"]["problemtype_data"]:
                         for problemdesciption in problemtype["description"]:
                             dados["problemtype"] += "(" + problemdesciption["lang"] + ") " + problemdesciption["value"] + "; "; 
-                #print( dados );
                 retorno = SendService(data["server"], "cve_write.php", dados, port=data["port"], protocol=data["protocol"] );
-                print(retorno);
                 time.sleep(5);
         except KeyboardInterrupt:
-            print( 'Interrupted');
             sys.exit(0);
         except:
             print("Não foi possível obter dados do CVE. Continuar.");

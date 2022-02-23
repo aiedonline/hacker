@@ -151,6 +151,13 @@ def dns_switch(server_ip, user, token, whois_json):
         domain["user"] = user;
         run_commands("domain/dns_ips.py", domain, dependencias=[{"name" : "dns", "install" : "dnspython"}] ,key=("domain/dns_ips.py" + domain["domain"]  ));
 
+def tecnology_find(server_ip, whois_json, user):
+    tecnologys = SendService(args["server"], "tecnology_list.php", {"domain_id" : domain_id}, port=args["port"], protocol=args["protocol"] );
+    for domain in  whois_json['domains']:
+        print('\033[91m\033[1m', "Run Search CVE: ", '\033[00m', domain['domain']);
+        for tecnology in tecnologys:
+            run_commands("cve/mitre_search.py", {"search" : tecnology["name"], "server" : server_ip, "port" : "80", "protocol" : "http", "user" :  user}, dependencias=[{"name" : "selenium", "install" : "selenium"}] ,key=("cve/mitre_search.py" + domain_id  ));
+
 try:
     # INSERT NA TABELA execution COM PROJECT_ID
     envelope = {"_id" : EXEC_ID , "project_id" : args["project"], "user" : args["user"], "token" : args["token"], "action" : "start" };
