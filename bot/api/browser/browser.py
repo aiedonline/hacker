@@ -227,6 +227,7 @@ class Browser:
 		self.driver.close();
 
 
-#b = Browser();
-#b.navegar("https://www.google.com", cache=1);
+#b = Browser( terminal=False);
+#b.navegar("https://www.google.com");
+#time.sleep(60);
 #print("Elemento:", b.elemento("//body").text);

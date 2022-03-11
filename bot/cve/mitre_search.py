@@ -1,4 +1,4 @@
-import sys, os, subprocess, traceback, time;
+import sys, os, subprocess, traceback, time, traceback;
 
 os.environ["ROOT"] = "/var/well/secanalysis/bot/";
 sys.path.insert(0, os.environ["ROOT"]);
@@ -8,10 +8,11 @@ from api.cacherequest import *;
 from api.browser.browser import *;
 data = sys.stdin.readlines();
 data = json.loads(data[0]);
+print(data);
 #data = {"search" : "apache", "server" : "127.0.0.1", "port" : "80", "protocol" : "http", "user" :  "c308f6804bdd1a856355d3a34113f22a5d5f799b"};
 
 c = CacheRequest(life=180);
-bw = Browser(terminal=False, path_directory_browser="/tmp/");
+bw = Browser(terminal=False);
 bw.navegar("https://www.cve.org/");
 
 if c.get("https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=" + data["search"]):
@@ -30,8 +31,10 @@ if c.get("https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=" + data["search"]):
             #  }
             print("\t\t", link.text_content());
             if cve_banco.get("description") == None:
+                print("URL:", "https://www.cve.org/CVERecord?id=" + link.text_content());
+                sys.exit(0);
                 bw.navegar("https://www.cve.org/CVERecord?id=" + link.text_content());
-                time.sleep(3);
+                time.sleep(30);
                 bw.clicar("/html/body/div/div/div/div/div/main/div/div/div/div/section/div/div[1]/button");
                 time.sleep(3);
                 js_cve = json.loads(bw.elemento('//*[@id="cve-json"]/*[1]').text);
@@ -66,6 +69,7 @@ if c.get("https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=" + data["search"]):
             sys.exit(0);
         except:
             print("Não foi possível obter dados do CVE. Continuar.");
+            traceback.print_exc();
             
 
 
